@@ -45,9 +45,10 @@ namespace InstitutionService
             services.AddScoped<IOfficersRepository, OfficersRepository>();
             services.AddScoped<IServicesInstitutionsRepository, ServicesInstitutionsRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IMessageSender, MessageSender>();
 
-            services.AddSingleton<IVerificationRepository>(new VerificationRepository(
-                Configuration.GetSection("Twilio").Get<Configuration.Twilio>()));
+            services.AddSingleton<IMessageSender>(new MessageSender(
+                Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -61,13 +62,9 @@ namespace InstitutionService
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

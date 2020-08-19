@@ -18,10 +18,12 @@ namespace InstitutionService.Repository
     {
         private readonly institutionserviceContext _context;
         private readonly IHelperRepository _helperRepository;
-        public InvitationsRepository(institutionserviceContext context, IHelperRepository helperRepository)
+        private readonly IMessageSender _messageSender;
+        public InvitationsRepository(institutionserviceContext context, IHelperRepository helperRepository, IMessageSender messageSender)
         {
             _context = context;
             _helperRepository = helperRepository;
+            _messageSender = messageSender;
         }
 
         public InvitationsResponse DeleteInvitation(int officerId, int id)
@@ -236,8 +238,9 @@ namespace InstitutionService.Repository
                 }
                 else
                 {
-                    //do something here to send SMS
+                    var res = await _messageSender.SendMessage(model.Phone, "Invitation Link: " + objInvitations.Link);
                 }
+
                 response.status = true;
                 response.message = "Invitation sent successfully.";
                 response.responseCode = ResponseCode.Created;
