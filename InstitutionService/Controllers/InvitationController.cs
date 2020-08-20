@@ -46,11 +46,11 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("officer/{officerid=0}/invitation/{id}")]
-        public IActionResult Get(int officersId, int id, [FromQuery] PageInfo pageInfo)
+        [Route("officer/{officerid=0}/{invitation}/{id=0}")]
+        public IActionResult Get(int officerId, int id, [FromQuery] PageInfo pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
-            response = _invitionRepository.GetInvitation(officersId, id, pageInfo);
+            response = _invitionRepository.GetInvitation(officerId, id, pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);
