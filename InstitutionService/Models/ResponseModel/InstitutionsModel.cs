@@ -12,5 +12,6 @@ namespace InstitutionService.Models.ResponseModel
         public DateTime? CreatedAt { get; set; }
         public int? PhoneNumber { get; set; }
         public string CountryIso { get; set; }
+        public List<int> services { get; set; }
     }
 }

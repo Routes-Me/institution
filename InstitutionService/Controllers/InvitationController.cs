@@ -22,7 +22,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpPost]
-        [Route("officer/{officerid=0}/{invitation}")]
+        [Route("officers/{officerid=0}/invitations")]
         public async Task<IActionResult> Post(int officerid, InvitationsModel model)
         {
             InvitationsResponse response = new InvitationsResponse();
@@ -34,7 +34,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpDelete]
-        [Route("officer/{officerid=0}/{invitation}/{id}")]
+        [Route("officers/{officerid=0}/{invitations}/{id}")]
         public IActionResult Delete(int officerid, int id)
         {
             InvitationsResponse response = new InvitationsResponse();
@@ -46,11 +46,11 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("officer/{officerid=0}/{invitation}/{id=0}")]
-        public IActionResult Get(int officerId, int id, [FromQuery] PageInfo pageInfo)
+        [Route("invitations/{invitationId=0}")]
+        public IActionResult Get(int invitationId, [FromQuery] PageInfo pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
-            response = _invitionRepository.GetInvitation(officerId, id, pageInfo);
+            response = _invitionRepository.GetInvitation(invitationId, pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);

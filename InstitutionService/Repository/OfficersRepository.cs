@@ -17,36 +17,11 @@ namespace InstitutionService.Repository
             _context = context;
         }
 
-        public OfficersResponse DeleteOfficers(int institutionId, int officerId)
+        public OfficersResponse DeleteOfficers(int officerId)
         {
             OfficersResponse response = new OfficersResponse();
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
-                if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                if (officerId <= 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
-
                 var officers = _context.Officers.Where(x => x.OfficerId == officerId).FirstOrDefault();
                 if (officers == null)
                 {
@@ -71,44 +46,17 @@ namespace InstitutionService.Repository
             }
         }
 
-        public OfficersGetResponse GetOfficers(int institutionId, int officerId, PageInfo pageInfo)
+        public OfficersGetResponse GetOfficers(int officerId, PageInfo pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();
             OfficersDetails officersDetails = new OfficersDetails();
             int totalCount = 0;
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
-                if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                if (officerId < 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
-
                 List<OfficersModel> objOfficersModelList = new List<OfficersModel>();
-
                 if (officerId == 0)
                 {
                     objOfficersModelList = (from officer in _context.Officers
-                                            where officer.InstitutionId == institutionId
                                             select new OfficersModel()
                                             {
                                                 OfficerId = officer.OfficerId,
@@ -116,12 +64,12 @@ namespace InstitutionService.Repository
                                                 UserId = officer.UserId
                                             }).OrderBy(a => a.OfficerId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
 
-                    totalCount = _context.Officers.Where(x => x.InstitutionId == institutionId).ToList().Count();
+                    totalCount = _context.Officers.ToList().Count();
                 }
                 else
                 {
                     objOfficersModelList = (from officer in _context.Officers
-                                            where officer.InstitutionId == institutionId && officer.OfficerId == officerId
+                                            where officer.OfficerId == officerId
                                             select new OfficersModel()
                                             {
                                                 OfficerId = officer.OfficerId,
@@ -129,7 +77,7 @@ namespace InstitutionService.Repository
                                                 UserId = officer.UserId
                                             }).OrderBy(a => a.OfficerId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
 
-                    totalCount = _context.Officers.Where(x => x.InstitutionId == institutionId && x.OfficerId == officerId).ToList().Count();
+                    totalCount = _context.Officers.Where(x => x.OfficerId == officerId).ToList().Count();
                 }
 
                 if (objOfficersModelList == null || objOfficersModelList.Count == 0)
@@ -166,28 +114,11 @@ namespace InstitutionService.Repository
             }
         }
 
-        public OfficersResponse InsertOfficers(int institutionId, OfficersPostModel model)
+        public OfficersResponse InsertOfficers(OfficersModel model)
         {
             OfficersResponse response = new OfficersResponse();
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
-                if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
                 if (model == null)
                 {
                     response.status = false;
@@ -196,10 +127,19 @@ namespace InstitutionService.Repository
                     return response;
                 }
 
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
+                if (InstitutionDetails == null)
+                {
+                    response.status = false;
+                    response.message = "Institution not found.";
+                    response.responseCode = ResponseCode.NotFound;
+                    return response;
+                }
+
                 Officers objOfficers = new Officers()
                 {
                     UserId = model.UserId,
-                    InstitutionId = institutionId
+                    InstitutionId = model.InstitutionId
                 };
                 _context.Officers.Add(objOfficers);
                 _context.SaveChanges();
@@ -217,28 +157,11 @@ namespace InstitutionService.Repository
             }
         }
 
-        public OfficersResponse UpdateOfficers(int institutionId, OfficersPostModel model)
+        public OfficersResponse UpdateOfficers(OfficersModel model)
         {
             OfficersResponse response = new OfficersResponse();
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
-                if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
                 if (model == null)
                 {
                     response.status = false;
@@ -255,7 +178,17 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                     return response;
                 }
-                officers.InstitutionId = institutionId;
+
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
+                if (InstitutionDetails == null)
+                {
+                    response.status = false;
+                    response.message = "Institution not found.";
+                    response.responseCode = ResponseCode.NotFound;
+                    return response;
+                }
+
+                officers.InstitutionId = model.InstitutionId;
                 officers.UserId = model.UserId;
                 _context.Officers.Update(officers);
                 _context.SaveChanges();

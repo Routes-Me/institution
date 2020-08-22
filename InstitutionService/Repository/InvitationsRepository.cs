@@ -64,27 +64,18 @@ namespace InstitutionService.Repository
             }
         }
 
-        public InvitationsGetResponse GetInvitation(int officerId, int invitationId, PageInfo pageInfo)
+        public InvitationsGetResponse GetInvitation(int invitationId, PageInfo pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
             InvitationsDetails invitationsDetails = new InvitationsDetails();
             int totalCount = 0;
             try
             {
-                var officer = _context.Officers.Where(x => x.OfficerId == officerId).FirstOrDefault();
-                if (officer == null)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
                 List<InvitationsGetModel> objInvitationsModelList = new List<InvitationsGetModel>();
                 if (invitationId == 0)
                 {
                     objInvitationsModelList = (from invitation in _context.Invitations
-                                               where invitation.OfficerId == officerId
+
                                                select new InvitationsGetModel()
                                                {
                                                    InvitationId = invitation.InvitationId,
@@ -95,12 +86,12 @@ namespace InstitutionService.Repository
                                                    OfficerId = invitation.OfficerId
                                                }).OrderBy(a => a.InvitationId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
 
-                    totalCount = _context.Invitations.Where(x => x.OfficerId == officerId).ToList().Count();
+                    totalCount = _context.Invitations.ToList().Count();
                 }
                 else
                 {
                     objInvitationsModelList = (from invitation in _context.Invitations
-                                               where invitation.OfficerId == officerId && invitation.InvitationId == invitationId
+                                               where invitation.InvitationId == invitationId
                                                select new InvitationsGetModel()
                                                {
                                                    InvitationId = invitation.InvitationId,
@@ -111,12 +102,12 @@ namespace InstitutionService.Repository
                                                    OfficerId = invitation.OfficerId
                                                }).OrderBy(a => a.InvitationId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
 
-                    totalCount = _context.Invitations.Where(x => x.OfficerId == officerId && x.InvitationId == invitationId).ToList().Count();
+                    totalCount = _context.Invitations.Where(x => x.InvitationId == invitationId).ToList().Count();
                 }
                 if (objInvitationsModelList == null || objInvitationsModelList.Count == 0)
                 {
                     response.status = false;
-                    response.message = "Institution not found.";
+                    response.message = "Invitations not found.";
                     response.data = null;
                     response.responseCode = ResponseCode.NotFound;
                     return response;
@@ -212,7 +203,7 @@ namespace InstitutionService.Repository
                 {
                     OfficerId = OfficerId,
                     Address = Address,
-                    RecipientName = model.RecipientName,
+                    RecipientName = model.Name,
                     Data = Data
                 };
 

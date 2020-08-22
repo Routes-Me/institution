@@ -11,10 +11,4 @@ namespace InstitutionService.Models.ResponseModel
         public int? UserId { get; set; }
         public int? InstitutionId { get; set; }
     }
-
-    public class OfficersPostModel
-    {
-        public int OfficerId { get; set; }
-        public int? UserId { get; set; }
-    }
 }

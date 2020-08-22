@@ -9,10 +9,10 @@ namespace InstitutionService.Abstraction
 {
     public interface IOfficersRepository
     {
-        OfficersResponse InsertOfficers(int institutionsId, OfficersPostModel Model);
-        OfficersResponse UpdateOfficers(int institutionsId, OfficersPostModel Model);
-        OfficersResponse DeleteOfficers(int institutionsId, int officerId);
-        OfficersGetResponse GetOfficers(int institutionsId, int officersId, PageInfo pageInfo); 
+        OfficersResponse InsertOfficers(OfficersModel Model);
+        OfficersResponse UpdateOfficers(OfficersModel Model);
+        OfficersResponse DeleteOfficers(int officerId);
+        OfficersGetResponse GetOfficers(int officersId, PageInfo pageInfo); 
     }
 }
     

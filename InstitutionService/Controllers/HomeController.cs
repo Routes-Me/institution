@@ -14,7 +14,7 @@ namespace InstitutionService.Controllers
         [HttpGet]
         public string Get()
         {
-            return "Institution service started successfully";
+            return "Institution service started successfully.";
         }
     }
 }

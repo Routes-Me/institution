@@ -11,6 +11,6 @@ namespace InstitutionService.Abstraction
     {
         Task<InvitationsResponse> InsertInvitation(int officerId, InvitationsModel model);
         InvitationsResponse DeleteInvitation(int officerId, int id);
-        InvitationsGetResponse GetInvitation(int officerId, int invitationId, PageInfo pageInfo);
+        InvitationsGetResponse GetInvitation(int invitationId, PageInfo pageInfo);
     }
 }

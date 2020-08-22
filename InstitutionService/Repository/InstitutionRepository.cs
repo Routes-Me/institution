@@ -38,6 +38,22 @@ namespace InstitutionService.Repository
                 };
                 _context.Institutions.Add(objInstitutions);
                 _context.SaveChanges();
+
+                foreach (var item in Model.services)
+                {
+                    var servicesDetails = _context.Services.Where(x => x.ServiceId == item).FirstOrDefault();
+                    if (servicesDetails != null)
+                    {
+                        Servicesinstitutions objServicesinstitutions = new Servicesinstitutions()
+                        {
+                            InstitutionId = objInstitutions.InstitutionId,
+                            ServiceId = item
+                        };
+                        _context.Servicesinstitutions.Add(objServicesinstitutions);
+                        _context.SaveChanges();
+                    }
+                }
+
                 response.status = true;
                 response.message = "Institution inserted successfully.";
                 response.responseCode = ResponseCode.Created;

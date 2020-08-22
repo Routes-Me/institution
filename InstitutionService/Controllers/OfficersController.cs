@@ -21,47 +21,47 @@ namespace InstitutionService.Controllers
         }
 
         [HttpPost]
-        [Route("institutions/{institutionsId=0}/officers")]
-        public IActionResult Post(int institutionsId, OfficersPostModel Model)
+        [Route("officers")]
+        public IActionResult Post(OfficersModel Model)
         {
             OfficersResponse response = new OfficersResponse();
             if (ModelState.IsValid)
-                response = _officersRepository.InsertOfficers(institutionsId, Model);
+                response = _officersRepository.InsertOfficers(Model);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);
         }
 
         [HttpPut]
-        [Route("institutions/{institutionsId=0}/officers")]
-        public IActionResult Put(int institutionsId, OfficersPostModel Model)
+        [Route("officers")]
+        public IActionResult Put(OfficersModel Model)
         {
             OfficersResponse response = new OfficersResponse();
             if (ModelState.IsValid)
-                response = _officersRepository.UpdateOfficers(institutionsId, Model);
+                response = _officersRepository.UpdateOfficers(Model);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);
         }
 
         [HttpDelete]
-        [Route("institutions/{institutionsId=0}/officers/{officersId}")]
-        public IActionResult Delete(int institutionsId, int officersId) 
+        [Route("officers/{officersId}")]
+        public IActionResult Delete(int officersId) 
         {
             OfficersResponse response = new OfficersResponse();
             if (ModelState.IsValid)
-                response = _officersRepository.DeleteOfficers(institutionsId, officersId);
+                response = _officersRepository.DeleteOfficers(officersId);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);
         }
 
         [HttpGet]
-        [Route("institutions/{institutionsId=0}/officers/{officersId=0}")]
-        public IActionResult Get(int institutionsId, int officersId, [FromQuery] PageInfo pageInfo)
+        [Route("officers/{officersId=0}")]
+        public IActionResult Get(int officersId, [FromQuery] PageInfo pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();   
-            response = _officersRepository.GetOfficers(institutionsId, officersId, pageInfo);
+            response = _officersRepository.GetOfficers(officersId, pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);
