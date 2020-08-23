@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
+using Newtonsoft.Json.Linq;
+using InstitutionService.Helper.Abstraction;
 
 namespace InstitutionService.Repository
 {
     public class OfficersRepository : IOfficersRepository
     {
         private readonly institutionserviceContext _context;
-        public OfficersRepository(institutionserviceContext context)
+        private readonly IOfficersIncludedRepository _officersIncludedRepository;
+        public OfficersRepository(institutionserviceContext context, IOfficersIncludedRepository officersIncludedRepository)
         {
             _context = context;
+            _officersIncludedRepository = officersIncludedRepository;
         }
 
         public OfficersResponse DeleteOfficers(int officerId)
@@ -28,6 +32,16 @@ namespace InstitutionService.Repository
                     response.status = false;
                     response.message = "Officer not found.";
                     response.responseCode = ResponseCode.NotFound;
+                }
+
+                var invitations = _context.Invitations.Where(x => x.OfficerId == officerId).ToList();
+                if (invitations != null)
+                {
+                    foreach (var item in invitations)
+                    {
+                        _context.Invitations.Remove(item);
+                        _context.SaveChanges();
+                    }
                 }
 
                 _context.Officers.Remove(officers);
@@ -46,7 +60,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public OfficersGetResponse GetOfficers(int officerId, PageInfo pageInfo)
+        public OfficersGetResponse GetOfficers(int officerId, string includeType, PageInfo pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();
             OfficersDetails officersDetails = new OfficersDetails();
@@ -97,10 +111,34 @@ namespace InstitutionService.Repository
                     total = totalCount
                 };
 
+                dynamic includeData = new JObject();
+                if (!string.IsNullOrEmpty(includeType))
+                {
+                    string[] includeArr = includeType.Split(',');
+                    if (includeArr.Length > 0)
+                    {
+                        foreach (var item in includeArr)
+                        {
+                            if (item.ToLower() == "user" || item.ToLower() == "users")
+                            {
+                                includeData.users = _officersIncludedRepository.GetUsersIncludedData(objOfficersModelList);
+                            }
+                            else if (item.ToLower() == "institution" || item.ToLower() == "institutions")
+                            {
+                                includeData.institutions = _officersIncludedRepository.GetInstitutionsIncludedData(objOfficersModelList);
+                            }
+                        }
+                    }
+                }
+
+                if (((JContainer)includeData).Count == 0)
+                    includeData = null;
+
                 response.status = true;
                 response.message = "Officers data retrived successfully.";
                 response.pagination = page;
                 response.data = officersDetails;
+                response.included = includeData;
                 response.responseCode = ResponseCode.Success;
                 return response;
             }

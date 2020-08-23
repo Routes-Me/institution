@@ -31,28 +31,6 @@ namespace InstitutionService.Controllers
             return Ok(response);
         }
 
-        //[HttpGet]
-        //[Route("institutions/{institutionId=0}/{vehicles}/{vehicleId=0}")]
-        //public IActionResult GetVehicles(int institutionId, int vehicleId, [FromQuery] PageInfo pageInfo)
-        //{
-        //    InstitutionVehicleResponse response = new InstitutionVehicleResponse();
-        //    response = _institutionRepository.GetVehicles(institutionId, vehicleId, pageInfo);
-        //    if (response.responseCode != ResponseCode.Success)
-        //        return GetActionResult(response);
-        //    return Ok(response);
-        //}
-
-        //[HttpGet]
-        //[Route("institutions/{institutionId=0}/vehicles/{vehicleId=0}/drivers/{driverId=0}")]
-        //public IActionResult GetDrivers(int institutionId, int vehicleId, int driverId, [FromQuery] PageInfo pageInfo)
-        //{
-        //    InstitutionDriverResponse response = new InstitutionDriverResponse();
-        //    response = _institutionRepository.GetDrivers(institutionId, vehicleId, driverId, pageInfo);
-        //    if (response.responseCode != ResponseCode.Success)
-        //        return GetActionResult(response);
-        //    return Ok(response);
-        //}
-
         [HttpPost]
         [Route("institutions")]
         public IActionResult Post(InstitutionsModel Model)

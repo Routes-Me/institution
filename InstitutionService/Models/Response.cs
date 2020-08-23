@@ -1,4 +1,6 @@
 ﻿using InstitutionService.Models.ResponseModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +52,7 @@ namespace InstitutionService.Models
 
     public class InstitutionDetails
     {
-        public List<InstitutionsModel> institution { get; set; }
+        public List<GetInstitutionsModel> institutions { get; set; }
     }
 
     public class InstitutionVehicleResponse : Response
@@ -100,12 +102,27 @@ namespace InstitutionService.Models
     {
         public Pagination pagination { get; set; }
         public OfficersDetails data { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public JObject included { get; set; }
     }
 
     public class OfficersDetails
     {
         public List<OfficersModel> officers { get; set; }
     }
+
+    public class UserData
+    {
+        public Pagination pagination { get; set; }
+        public UserDetails data { get; set; }
+    }
+
+    public class UserDetails
+    {
+        public List<UserModel> users { get; set; }
+    }
+
     #endregion
 
     #region ServicesInstitutions Response
@@ -115,6 +132,9 @@ namespace InstitutionService.Models
     {
         public Pagination pagination { get; set; }
         public ServicesInstitutionsDetails data { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public JObject included { get; set; }
     }
 
     public class ServicesInstitutionsDetails

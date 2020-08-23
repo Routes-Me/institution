@@ -23,12 +23,20 @@ namespace InstitutionService.Repository
             {
                 var servicesData = _context.Services.Where(x => x.ServiceId == id).FirstOrDefault();
                 if (servicesData == null)
-                {   
+                {
                     response.status = false;
                     response.message = "Service not found.";
                     response.responseCode = ResponseCode.NotFound;
                 }
-                
+                var servicesInstitutions = _context.Servicesinstitutions.Where(x => x.ServiceId == id).ToList();
+                if (servicesInstitutions != null)
+                {
+                    foreach (var item in servicesInstitutions)
+                    {
+                        _context.Servicesinstitutions.Remove(item);
+                        _context.SaveChanges();
+                    }
+                }
                 _context.Services.Remove(servicesData);
                 _context.SaveChanges();
                 response.status = true;
@@ -56,12 +64,12 @@ namespace InstitutionService.Repository
                 if (servicesId == 0)
                 {
                     objServicesModelList = (from services in _context.Services
-                                                select new ServicesModel()
-                                                {
-                                                    ServiceId = services.ServiceId,
-                                                    Name = services.Name,
-                                                    Description = services.Description,
-                                                }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                            select new ServicesModel()
+                                            {
+                                                ServiceId = services.ServiceId,
+                                                Name = services.Name,
+                                                Description = services.Description,
+                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
 
                     totalCount = _context.Services.ToList().Count();
                 }
@@ -70,7 +78,7 @@ namespace InstitutionService.Repository
                     objServicesModelList = (from services in _context.Services
                                             where services.ServiceId == servicesId
                                             select new ServicesModel()
-                                                {
+                                            {
                                                 ServiceId = services.ServiceId,
                                                 Name = services.Name,
                                                 Description = services.Description,

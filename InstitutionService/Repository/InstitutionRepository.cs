@@ -32,7 +32,7 @@ namespace InstitutionService.Repository
                 Institutions objInstitutions = new Institutions()
                 {
                     Name = Model.Name,
-                    CreatedAt = Model.CreatedAt,
+                    CreatedAt = DateTime.UtcNow,
                     PhoneNumber = Model.PhoneNumber,
                     CountryIso = Model.CountryIso
                 };
@@ -91,7 +91,7 @@ namespace InstitutionService.Repository
                 }
 
                 institutionsData.Name = Model.Name;
-                institutionsData.CreatedAt = Model.CreatedAt;
+                institutionsData.CreatedAt = DateTime.UtcNow;
                 institutionsData.PhoneNumber = Model.PhoneNumber;
                 institutionsData.CountryIso = Model.CountryIso;
 
@@ -169,11 +169,11 @@ namespace InstitutionService.Repository
             int totalCount = 0;
             try
             {
-                List<InstitutionsModel> objInstitutionsModelList = new List<InstitutionsModel>();
+                List<GetInstitutionsModel> objInstitutionsModelList = new List<GetInstitutionsModel>();
                 if (institutionId == 0)
                 {
                     objInstitutionsModelList = (from institution in _context.Institutions
-                                                select new InstitutionsModel()
+                                                select new GetInstitutionsModel()
                                                 {
                                                     InstitutionId = institution.InstitutionId,
                                                     Name = institution.Name,
@@ -188,7 +188,7 @@ namespace InstitutionService.Repository
                 {
                     objInstitutionsModelList = (from institution in _context.Institutions
                                                 where institution.InstitutionId == institutionId
-                                                select new InstitutionsModel()
+                                                select new GetInstitutionsModel()
                                                 {
                                                     InstitutionId = institution.InstitutionId,
                                                     Name = institution.Name,
@@ -207,7 +207,7 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                     return response;
                 }
-                institutionDetails.institution = objInstitutionsModelList;
+                institutionDetails.institutions = objInstitutionsModelList;
                 var page = new Pagination
                 {
                     offset = pageInfo.currentPage,
@@ -226,269 +226,6 @@ namespace InstitutionService.Repository
             {
                 response.status = false;
                 response.message = "Something went wrong while fetching institutions. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
-            }
-        }
-
-        public InstitutionVehicleResponse GetVehicles(int institutionId, int vehicleId, PageInfo pageInfo)
-        {
-            InstitutionVehicleResponse response = new InstitutionVehicleResponse();
-            InstitutionVehicleDetails vehicleDeails = new InstitutionVehicleDetails();
-            int totalCount = 0;
-            try
-            {
-                List<VehiclesModel> objVehiclesModelList = new List<VehiclesModel>();
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-                else
-                {
-                    var institutionCount = _context.Institutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
-                    if (institutionCount == 0)
-                    {
-                        response.status = false;
-                        response.message = "Institution not found.";
-                        response.data = null;
-                        response.responseCode = ResponseCode.NotFound;
-                        return response;
-                    }
-                    else
-                    {
-                        //if (vehicleId == 0)
-                        //{
-                        //    objVehiclesModelList = (from institution in _context.Institutions
-                        //                            join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                            where institution.InstitutionId == institutionId
-                        //                            select new VehiclesModel()
-                        //                            {
-                        //                                VehicleId = vehicle.VehicleId,
-                        //                                DeviceId = vehicle.DeviceId,
-                        //                                PlateNumber = vehicle.PlateNumber,
-                        //                                InstitutionId = vehicle.InstitutionId,
-                        //                                ModelYear = Convert.ToDateTime(vehicle.ModelYear).Year,
-                        //                                ModelId = vehicle.ModelId
-                        //                            }).OrderBy(a => a.VehicleId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
-
-                        //    totalCount = (from institution in _context.Institutions
-                        //                         join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                         where institution.InstitutionId == institutionId
-                        //                         select new VehiclesModel()
-                        //                         {
-                        //                             VehicleId = vehicle.VehicleId,
-                        //                             DeviceId = vehicle.DeviceId,
-                        //                             PlateNumber = vehicle.PlateNumber,
-                        //                             InstitutionId = vehicle.InstitutionId,
-                        //                             ModelYear = Convert.ToDateTime(vehicle.ModelYear).Year,
-                        //                             ModelId = vehicle.ModelId
-                        //                         }).ToList().Count;
-                        //}
-                        //else
-                        //{
-
-                        //    objVehiclesModelList = (from institution in _context.Institutions
-                        //                            join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                            where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId
-                        //                            select new VehiclesModel()
-                        //                            {
-                        //                                VehicleId = vehicle.VehicleId,
-                        //                                DeviceId = vehicle.DeviceId,
-                        //                                PlateNumber = vehicle.PlateNumber,
-                        //                                InstitutionId = vehicle.InstitutionId,
-                        //                                ModelYear = Convert.ToDateTime(vehicle.ModelYear).Year,
-                        //                                ModelId = vehicle.ModelId
-                        //                            }).OrderBy(a => a.VehicleId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
-
-                        //    totalCount = (from institution in _context.Institutions
-                        //                         join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                         where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId
-                        //                         select new VehiclesModel()
-                        //                         {
-                        //                             VehicleId = vehicle.VehicleId,
-                        //                             DeviceId = vehicle.DeviceId,
-                        //                             PlateNumber = vehicle.PlateNumber,
-                        //                             InstitutionId = vehicle.InstitutionId,
-                        //                             ModelYear = Convert.ToDateTime(vehicle.ModelYear).Year,
-                        //                             ModelId = vehicle.ModelId
-                        //                         }).ToList().Count;
-
-                        //}
-                    }
-                }
-
-                if (objVehiclesModelList == null || objVehiclesModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Vehicle not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                vehicleDeails.vehicles = objVehiclesModelList;
-
-                var page = new Pagination
-                {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
-                    total = totalCount
-                };
-
-                response.status = true;
-                response.message = "Vehicles data retrived successfully.";
-                response.pagination = page;
-                response.data = vehicleDeails;
-                response.responseCode = ResponseCode.Success;
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.status = false;
-                response.message = "Something went wrong while fetching vehicles. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
-            }
-        }
-
-        public InstitutionDriverResponse GetDrivers(int institutionId, int vehicleId, int driverId, PageInfo pageInfo)
-        {
-            InstitutionDriverResponse response = new InstitutionDriverResponse();
-            InstitutionDriverDetails driverDeails = new InstitutionDriverDetails();
-            int totalCount = 0;
-            try
-            {
-                List<DriversModel> objDriversModelList = new List<DriversModel>();
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-                else
-                {
-                    var institutionCount = _context.Institutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
-                    if (institutionCount == 0)
-                    {
-                        response.status = false;
-                        response.message = "Institution not found.";
-                        response.data = null;
-                        response.responseCode = ResponseCode.NotFound;
-                        return response;
-                    }
-                    else
-                    {
-                        if (vehicleId == 0)
-                        {
-                            response.status = false;
-                            response.message = "Vehicle not found.";
-                            response.data = null;
-                            response.responseCode = ResponseCode.NotFound;
-                            return response;
-                        }
-                        //else
-                        //{
-                        //    var vehicleCount = _context.Vehicles.Where(x => x.VehicleId == vehicleId).ToList().Count();
-                        //    if (vehicleCount == 0)
-                        //    {
-                        //        response.status = false;
-                        //        response.message = "Vehicle not found.";
-                        //        response.data = null;
-                        //        response.responseCode = ResponseCode.NotFound;
-                        //        return response;
-                        //    }
-                        //    else
-                        //    {
-                        //        if (driverId == 0)
-                        //        {
-                        //            objDriversModelList = (from institution in _context.Institutions
-                        //                                   join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                                   join drive in _context.Drives on vehicle.VehicleId equals drive.VehicleId
-                        //                                   join driver in _context.Drivers on drive.DriverId equals driver.DriverId
-                        //                                   where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId
-                        //                                   select new DriversModel()
-                        //                                   {
-                        //                                       DriverId = driver.DriverId,
-                        //                                       UserId = driver.UserId
-                        //                                   }).OrderBy(a => a.DriverId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
-
-
-                        //            totalCount = (from institution in _context.Institutions
-                        //                          join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                          join drive in _context.Drives on vehicle.VehicleId equals drive.VehicleId
-                        //                          join driver in _context.Drivers on drive.DriverId equals driver.DriverId
-                        //                          where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId
-                        //                          select new DriversModel()
-                        //                          {
-                        //                              DriverId = driver.DriverId,
-                        //                              UserId = driver.UserId
-                        //                          }).ToList().Count();
-                        //        }
-                        //        else
-                        //        {
-                        //            objDriversModelList = (from institution in _context.Institutions
-                        //                                   join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                                   join drive in _context.Drives on vehicle.VehicleId equals drive.VehicleId
-                        //                                   join driver in _context.Drivers on drive.DriverId equals driver.DriverId
-                        //                                   where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId && driver.DriverId == driverId
-                        //                                   select new DriversModel()
-                        //                                   {
-                        //                                       DriverId = driver.DriverId,
-                        //                                       UserId = driver.UserId
-                        //                                   }).OrderBy(a => a.DriverId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
-
-
-                        //            totalCount = (from institution in _context.Institutions
-                        //                          join vehicle in _context.Vehicles on institution.InstitutionId equals vehicle.InstitutionId
-                        //                          join drive in _context.Drives on vehicle.VehicleId equals drive.VehicleId
-                        //                          join driver in _context.Drivers on drive.DriverId equals driver.DriverId
-                        //                          where institution.InstitutionId == institutionId && vehicle.VehicleId == vehicleId && driver.DriverId == driverId
-                        //                          select new DriversModel()
-                        //                          {
-                        //                              DriverId = driver.DriverId,
-                        //                              UserId = driver.UserId
-                        //                          }).ToList().Count();
-                        //        }
-                        //    }
-                        //}
-                    }
-                }
-
-                if (objDriversModelList == null || objDriversModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Driver not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-                driverDeails.drivers = objDriversModelList;
-                var page = new Pagination
-                {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
-                    total = totalCount
-                };
-
-                response.status = true;
-                response.message = "Drivers data retrived successfully.";
-                response.pagination = page;
-                response.data = driverDeails;
-                response.responseCode = ResponseCode.Success;
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.status = false;
-                response.message = "Something went wrong while fetching drivers. Error Message - " + ex.Message;
                 response.data = null;
                 response.responseCode = ResponseCode.InternalServerError;
                 return response;

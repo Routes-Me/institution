@@ -58,10 +58,10 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("officers/{officersId=0}")]
-        public IActionResult Get(int officersId, [FromQuery] PageInfo pageInfo)
+        public IActionResult Get(int officersId,string include, [FromQuery] PageInfo pageInfo)
         {
-            OfficersGetResponse response = new OfficersGetResponse();   
-            response = _officersRepository.GetOfficers(officersId, pageInfo);
+            OfficersGetResponse response = new OfficersGetResponse();
+            response = _officersRepository.GetOfficers(officersId, include, pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);

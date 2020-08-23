@@ -13,7 +13,5 @@ namespace InstitutionService.Abstraction
         InstitutionResponse UpdateInstitution(InstitutionsModel institutionModel);
         InstitutionResponse DeleteInstitution(int id);
         InstitutionGetResponse GetInstitutions(int institutionId, PageInfo pageInfo);
-        InstitutionVehicleResponse GetVehicles(int institutionId, int vehicleId, PageInfo pageInfo);
-        InstitutionDriverResponse GetDrivers(int institutionId, int vehicleId, int driverId, PageInfo pageInfo);
     }
 }
