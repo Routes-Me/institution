@@ -58,10 +58,10 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("institutions/{institutionId=0}/services/{servicesId=0}")]
-        public IActionResult Get(int institutionId, int servicesId, [FromQuery] PageInfo pageInfo)
+        public IActionResult Get(int institutionId, int servicesId, string include, [FromQuery] PageInfo pageInfo)
         {
             ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-            response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, servicesId, pageInfo);
+            response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, servicesId, include,pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);

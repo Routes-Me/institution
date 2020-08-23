@@ -1,7 +1,9 @@
 ﻿using InstitutionService.Abstraction;
+using InstitutionService.Helper.Abstraction;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,11 @@ namespace InstitutionService.Repository
     public class ServicesInstitutionsRepository : IServicesInstitutionsRepository
     {
         private readonly institutionserviceContext _context;
-        public ServicesInstitutionsRepository(institutionserviceContext context)
+        private readonly  IServiceInstitutionIncludedRepository _serviceInstitutionIncludedRepository;
+        public ServicesInstitutionsRepository(institutionserviceContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
         {
             _context = context;
+            _serviceInstitutionIncludedRepository = serviceInstitutionIncludedRepository;
         }
 
         public ServicesInstitutionsResponse DeleteServicesInstitutions(int institutionId, int serviceId)
@@ -71,7 +75,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, PageInfo pageInfo)
+        public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, string includeType, PageInfo pageInfo)
         {
             ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
             ServicesInstitutionsDetails servicesInstitutionsDetails = new ServicesInstitutionsDetails();
@@ -146,10 +150,35 @@ namespace InstitutionService.Repository
                     total = totalCount
                 };
 
+                dynamic includeData = new JObject();
+                if (!string.IsNullOrEmpty(includeType))
+                {
+                    string[] includeArr = includeType.Split(',');
+                    if (includeArr.Length > 0)
+                    {
+                        foreach (var item in includeArr)
+                        {
+                            if (item.ToLower() == "institution" || item.ToLower() == "institutions")
+                            {
+                                includeData.institutions = _serviceInstitutionIncludedRepository.GetInstitutionsIncludedData(objServicesInstitutionsModel);
+                            }
+                            else if(item.ToLower() == "service" || item.ToLower() == "services")
+                            {
+                                includeData.services = _serviceInstitutionIncludedRepository.GetServiceIncludedData(objServicesInstitutionsModel);
+                            }
+                             
+                        }
+                    }
+                }
+
+                if (((JContainer)includeData).Count == 0)
+                    includeData = null;
+
                 response.status = true;
                 response.message = "Services institutions data retrived successfully.";
                 response.pagination = page;
                 response.data = servicesInstitutionsDetails;
+                response.included = includeData;
                 response.responseCode = ResponseCode.Success;
                 return response;
             }

@@ -12,7 +12,7 @@ namespace InstitutionService.Abstraction
         OfficersResponse InsertOfficers(OfficersModel Model);
         OfficersResponse UpdateOfficers(OfficersModel Model);
         OfficersResponse DeleteOfficers(int officerId);
-        OfficersGetResponse GetOfficers(int officersId, PageInfo pageInfo); 
+        OfficersGetResponse GetOfficers(int officersId,string include, PageInfo pageInfo); 
     }
 }
     

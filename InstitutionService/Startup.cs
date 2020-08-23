@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace InstitutionService
 {
@@ -33,6 +34,11 @@ namespace InstitutionService
         {
             services.AddControllers();
 
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+
             services.AddDbContext<InstitutionService.Models.DBModels.institutionserviceContext>(options =>
             {
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
@@ -46,6 +52,10 @@ namespace InstitutionService
             services.AddScoped<IServicesInstitutionsRepository, ServicesInstitutionsRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
             services.AddScoped<IMessageSender, MessageSender>();
+            services.AddScoped<IServiceInstitutionIncludedRepository, ServiceInstitutionIncludedRepository>();
+            services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
+
+
 
             services.AddSingleton<IMessageSender>(new MessageSender(
                 Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
