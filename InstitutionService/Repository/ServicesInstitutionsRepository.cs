@@ -75,7 +75,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, string includeType, PageInfo pageInfo)
+        public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, string includeType, Pagination pageInfo)
         {
             ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
             ServicesInstitutionsDetails servicesInstitutionsDetails = new ServicesInstitutionsDetails();
@@ -116,7 +116,7 @@ namespace InstitutionService.Repository
                                                     {
                                                         InstitutionId = servicesinstitution.InstitutionId,
                                                         ServiceId = servicesinstitution.ServiceId
-                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Servicesinstitutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
                 }
@@ -128,7 +128,7 @@ namespace InstitutionService.Repository
                                                     {
                                                         InstitutionId = servicesinstitution.InstitutionId,
                                                         ServiceId = servicesinstitution.ServiceId
-                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Servicesinstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).ToList().Count();
                 }
@@ -145,8 +145,8 @@ namespace InstitutionService.Repository
                 servicesInstitutionsDetails.servicesInstitutions = objServicesInstitutionsModel;
                 var page = new Pagination
                 {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
                     total = totalCount
                 };
 

@@ -12,6 +12,6 @@ namespace InstitutionService.Abstraction
         ServicesResponse InsertService(ServicesModel model);
         ServicesResponse UpdateService(ServicesModel model);
         ServicesResponse DeleteService(int id);
-        ServicesGetResponse GetServices(int servicesId, PageInfo pageInfo);
+        ServicesGetResponse GetServices(int servicesId, Pagination pageInfo);
     }
 }

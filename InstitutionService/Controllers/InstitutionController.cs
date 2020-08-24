@@ -22,7 +22,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("institutions/{institutionId=0}")]
-        public IActionResult GeInstitutions(int institutionId, [FromQuery] PageInfo pageInfo)
+        public IActionResult GeInstitutions(int institutionId, [FromQuery] Pagination pageInfo)
         {
             InstitutionGetResponse response = new InstitutionGetResponse();
             response = _institutionRepository.GetInstitutions(institutionId, pageInfo);

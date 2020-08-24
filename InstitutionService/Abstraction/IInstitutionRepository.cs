@@ -12,6 +12,6 @@ namespace InstitutionService.Abstraction
         InstitutionResponse InsertInstitutions(InstitutionsModel institutionModel);
         InstitutionResponse UpdateInstitution(InstitutionsModel institutionModel);
         InstitutionResponse DeleteInstitution(int id);
-        InstitutionGetResponse GetInstitutions(int institutionId, PageInfo pageInfo);
+        InstitutionGetResponse GetInstitutions(int institutionId, Pagination pageInfo);
     }
 }

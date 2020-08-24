@@ -60,7 +60,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public OfficersGetResponse GetOfficers(int officerId, string includeType, PageInfo pageInfo)
+        public OfficersGetResponse GetOfficers(int officerId, string includeType, Pagination pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();
             OfficersDetails officersDetails = new OfficersDetails();
@@ -76,7 +76,7 @@ namespace InstitutionService.Repository
                                                 OfficerId = officer.OfficerId,
                                                 InstitutionId = officer.InstitutionId,
                                                 UserId = officer.UserId
-                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Officers.ToList().Count();
                 }
@@ -89,7 +89,7 @@ namespace InstitutionService.Repository
                                                 OfficerId = officer.OfficerId,
                                                 InstitutionId = officer.InstitutionId,
                                                 UserId = officer.UserId
-                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Officers.Where(x => x.OfficerId == officerId).ToList().Count();
                 }
@@ -106,8 +106,8 @@ namespace InstitutionService.Repository
                 officersDetails.officers = objOfficersModelList;
                 var page = new Pagination
                 {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
                     total = totalCount
                 };
 

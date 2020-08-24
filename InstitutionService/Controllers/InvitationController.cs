@@ -47,7 +47,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("invitations/{invitationId=0}")]
-        public IActionResult Get(int invitationId, [FromQuery] PageInfo pageInfo)
+        public IActionResult Get(int invitationId, [FromQuery] Pagination pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
             response = _invitionRepository.GetInvitation(invitationId, pageInfo);

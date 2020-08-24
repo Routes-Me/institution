@@ -162,7 +162,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public InstitutionGetResponse GetInstitutions(int institutionId, PageInfo pageInfo)
+        public InstitutionGetResponse GetInstitutions(int institutionId, Pagination pageInfo)
         {
             InstitutionGetResponse response = new InstitutionGetResponse();
             InstitutionDetails institutionDetails = new InstitutionDetails();
@@ -180,7 +180,7 @@ namespace InstitutionService.Repository
                                                     CreatedAt = institution.CreatedAt,
                                                     PhoneNumber = institution.PhoneNumber,
                                                     CountryIso = institution.CountryIso,
-                                                }).OrderBy(a => a.InstitutionId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                                }).OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Institutions.ToList().Count();
                 }
@@ -195,7 +195,7 @@ namespace InstitutionService.Repository
                                                     CreatedAt = institution.CreatedAt,
                                                     PhoneNumber = institution.PhoneNumber,
                                                     CountryIso = institution.CountryIso,
-                                                }).OrderBy(a => a.InstitutionId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                                }).OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Institutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
                 }
@@ -210,8 +210,8 @@ namespace InstitutionService.Repository
                 institutionDetails.institutions = objInstitutionsModelList;
                 var page = new Pagination
                 {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
                     total = totalCount
                 };
 

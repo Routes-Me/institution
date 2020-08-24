@@ -58,7 +58,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]   
         [Route("services/{servicesId=0}")]
-        public IActionResult Get(int servicesId, [FromQuery] PageInfo pageInfo)
+        public IActionResult Get(int servicesId, [FromQuery] Pagination pageInfo)
         {
             ServicesGetResponse response = new ServicesGetResponse();
             response = _serviceRepository.GetServices(servicesId, pageInfo);

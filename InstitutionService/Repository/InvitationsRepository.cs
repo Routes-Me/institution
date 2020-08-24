@@ -64,7 +64,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public InvitationsGetResponse GetInvitation(int invitationId, PageInfo pageInfo)
+        public InvitationsGetResponse GetInvitation(int invitationId, Pagination pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
             InvitationsDetails invitationsDetails = new InvitationsDetails();
@@ -84,7 +84,7 @@ namespace InstitutionService.Repository
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
                                                    OfficerId = invitation.OfficerId
-                                               }).OrderBy(a => a.InvitationId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                               }).OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Invitations.ToList().Count();
                 }
@@ -100,7 +100,7 @@ namespace InstitutionService.Repository
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
                                                    OfficerId = invitation.OfficerId
-                                               }).OrderBy(a => a.InvitationId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                               }).OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Invitations.Where(x => x.InvitationId == invitationId).ToList().Count();
                 }
@@ -115,8 +115,8 @@ namespace InstitutionService.Repository
                 invitationsDetails.Invitations = objInvitationsModelList;
                 var page = new Pagination
                 {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
                     total = totalCount
                 };
 

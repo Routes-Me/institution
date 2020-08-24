@@ -53,7 +53,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public ServicesGetResponse GetServices(int servicesId, PageInfo pageInfo)
+        public ServicesGetResponse GetServices(int servicesId, Pagination pageInfo)
         {
             ServicesGetResponse response = new ServicesGetResponse();
             ServicesDetails servicesDetails = new ServicesDetails();
@@ -69,7 +69,7 @@ namespace InstitutionService.Repository
                                                 ServiceId = services.ServiceId,
                                                 Name = services.Name,
                                                 Description = services.Description,
-                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Services.ToList().Count();
                 }
@@ -82,7 +82,7 @@ namespace InstitutionService.Repository
                                                 ServiceId = services.ServiceId,
                                                 Name = services.Name,
                                                 Description = services.Description,
-                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.currentPage - 1) * pageInfo.pageSize).Take(pageInfo.pageSize).ToList();
+                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Services.Where(x => x.ServiceId == servicesId).ToList().Count();
                 }
@@ -97,8 +97,8 @@ namespace InstitutionService.Repository
                 servicesDetails.services = objServicesModelList;
                 var page = new Pagination
                 {
-                    offset = pageInfo.currentPage,
-                    limit = pageInfo.pageSize,
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
                     total = totalCount
                 };
                 response.status = true;
