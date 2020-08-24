@@ -22,10 +22,10 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("institutions/{institutionId=0}")]
-        public IActionResult GeInstitutions(int institutionId, [FromQuery] Pagination pageInfo)
+        public IActionResult GeInstitutions(int institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             InstitutionGetResponse response = new InstitutionGetResponse();
-            response = _institutionRepository.GetInstitutions(institutionId, pageInfo);
+            response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
             if (response.responseCode != ResponseCode.Success)
                 return GetActionResult(response);
             return Ok(response);

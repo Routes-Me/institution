@@ -63,7 +63,6 @@ namespace InstitutionService.Repository
         public OfficersGetResponse GetOfficers(int officerId, string includeType, Pagination pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();
-            OfficersDetails officersDetails = new OfficersDetails();
             int totalCount = 0;
             try
             {
@@ -103,7 +102,6 @@ namespace InstitutionService.Repository
                     return response;
                 }
 
-                officersDetails.officers = objOfficersModelList;
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -137,7 +135,7 @@ namespace InstitutionService.Repository
                 response.status = true;
                 response.message = "Officers data retrived successfully.";
                 response.pagination = page;
-                response.data = officersDetails;
+                response.data = objOfficersModelList;
                 response.included = includeData;
                 response.responseCode = ResponseCode.Success;
                 return response;

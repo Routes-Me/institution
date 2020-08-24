@@ -65,7 +65,7 @@ namespace InstitutionService.Helper.Repository
                 {
                     var result = response.Content;
                     var userData = JsonConvert.DeserializeObject<UserData>(result);
-                    lstUsers.AddRange(userData.data.users);
+                    lstUsers.AddRange(userData.data);
                 }
             }
             var usersList = lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();

@@ -8,16 +8,16 @@ namespace InstitutionService.Models.DBModels
         public Institutions()
         {
             Officers = new HashSet<Officers>();
-            Servicesinstitutions = new HashSet<Servicesinstitutions>();
+            ServicesInstitutions = new HashSet<ServicesInstitutions>();
         }
 
         public int InstitutionId { get; set; }
         public string Name { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public int? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
         public string CountryIso { get; set; }
 
         public virtual ICollection<Officers> Officers { get; set; }
-        public virtual ICollection<Servicesinstitutions> Servicesinstitutions { get; set; }
+        public virtual ICollection<ServicesInstitutions> ServicesInstitutions { get; set; }
     }
 }

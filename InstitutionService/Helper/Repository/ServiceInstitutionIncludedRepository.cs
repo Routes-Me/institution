@@ -57,7 +57,7 @@ namespace InstitutionService.Helper.Repository
                     {
                         ServiceId = servicesDetails.ServiceId,
                         Name = servicesDetails.Name,
-                        Description = servicesDetails.Description,
+                        Description = servicesDetails.Descriptions,
                     });
                 }
             }

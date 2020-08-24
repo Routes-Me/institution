@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace InstitutionService.Models.DBModels
 {
-    public partial class Servicesinstitutions
+    public partial class ServicesInstitutions
     {
-        public int Id { get; set; }
         public int InstitutionId { get; set; }
         public int ServiceId { get; set; }
 

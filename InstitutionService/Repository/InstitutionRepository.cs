@@ -1,7 +1,9 @@
 ﻿using InstitutionService.Abstraction;
+using InstitutionService.Helper.Abstraction;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,11 @@ namespace InstitutionService.Repository
     public class InstitutionRepository : IInstitutionRepository
     {
         private readonly institutionserviceContext _context;
-        public InstitutionRepository(institutionserviceContext context)
+        private readonly IInstitutionIncludedRepository _institutionIncludedRepository;
+        public InstitutionRepository(institutionserviceContext context, IInstitutionIncludedRepository institutionIncludedRepository)
         {
             _context = context;
+            _institutionIncludedRepository = institutionIncludedRepository;
         }
 
         public InstitutionResponse InsertInstitutions(InstitutionsModel Model)
@@ -44,12 +48,12 @@ namespace InstitutionService.Repository
                     var servicesDetails = _context.Services.Where(x => x.ServiceId == item).FirstOrDefault();
                     if (servicesDetails != null)
                     {
-                        Servicesinstitutions objServicesinstitutions = new Servicesinstitutions()
+                        ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
                         {
                             InstitutionId = objInstitutions.InstitutionId,
                             ServiceId = item
                         };
-                        _context.Servicesinstitutions.Add(objServicesinstitutions);
+                        _context.ServicesInstitutions.Add(objServicesinstitutions);
                         _context.SaveChanges();
                     }
                 }
@@ -162,10 +166,9 @@ namespace InstitutionService.Repository
             }
         }
 
-        public InstitutionGetResponse GetInstitutions(int institutionId, Pagination pageInfo)
+        public InstitutionGetResponse GetInstitutions(int institutionId, string includeType, Pagination pageInfo)
         {
             InstitutionGetResponse response = new InstitutionGetResponse();
-            InstitutionDetails institutionDetails = new InstitutionDetails();
             int totalCount = 0;
             try
             {
@@ -207,7 +210,6 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                     return response;
                 }
-                institutionDetails.institutions = objInstitutionsModelList;
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -215,10 +217,30 @@ namespace InstitutionService.Repository
                     total = totalCount
                 };
 
+                dynamic includeData = new JObject();
+                if (!string.IsNullOrEmpty(includeType))
+                {
+                    string[] includeArr = includeType.Split(',');
+                    if (includeArr.Length > 0)
+                    {
+                        foreach (var item in includeArr)
+                        {
+                            if (item.ToLower() == "service" || item.ToLower() == "services")
+                            {
+                                includeData.services = _institutionIncludedRepository.GetServiceIncludedData(objInstitutionsModelList);
+                            }
+                        }
+                    }
+                }
+
+                if (((JContainer)includeData).Count == 0)
+                    includeData = null;
+
                 response.status = true;
                 response.message = "Institutions data retrived successfully.";
                 response.pagination = page;
-                response.data = institutionDetails;
+                response.data = objInstitutionsModelList;
+                response.included = includeData;
                 response.responseCode = ResponseCode.Success;
                 return response;
             }

@@ -54,6 +54,8 @@ namespace InstitutionService
             services.AddScoped<IMessageSender, MessageSender>();
             services.AddScoped<IServiceInstitutionIncludedRepository, ServiceInstitutionIncludedRepository>();
             services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
+            services.AddScoped<IInstitutionIncludedRepository, InstitutionIncludedRepository>();
+            
 
 
 

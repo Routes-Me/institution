@@ -47,36 +47,21 @@ namespace InstitutionService.Models
     public class InstitutionGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public InstitutionDetails data { get; set; }
+        public List<GetInstitutionsModel> data { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public JObject included { get; set; }
     }
-
-    public class InstitutionDetails
-    {
-        public List<GetInstitutionsModel> institutions { get; set; }
-    }
-
     public class InstitutionVehicleResponse : Response
     {
         public Pagination pagination { get; set; }
-        public InstitutionVehicleDetails data { get; set; }
-    }
-
-    public class InstitutionVehicleDetails
-    {
-        public List<VehiclesModel> vehicles { get; set; }
+        public List<VehiclesModel> data { get; set; }
     }
 
     public class InstitutionDriverResponse : Response
     {
         public Pagination pagination { get; set; }
-        public InstitutionDriverDetails data { get; set; }
+        public List<DriversModel> data { get; set; }
     }
-
-    public class InstitutionDriverDetails
-    {
-        public List<DriversModel> drivers { get; set; }
-    }
-
     #endregion
 
     #region Services Response
@@ -86,12 +71,7 @@ namespace InstitutionService.Models
     public class ServicesGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public ServicesDetails data { get; set; }
-    }
-
-    public class ServicesDetails
-    {
-        public List<ServicesModel> services { get; set; }
+        public List<ServicesModel> data { get; set; }
     }
     #endregion
 
@@ -101,26 +81,15 @@ namespace InstitutionService.Models
     public class OfficersGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public OfficersDetails data { get; set; }
+        public List<OfficersModel> data { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject included { get; set; }
     }
-
-    public class OfficersDetails
-    {
-        public List<OfficersModel> officers { get; set; }
-    }
-
     public class UserData
     {
         public Pagination pagination { get; set; }
-        public UserDetails data { get; set; }
-    }
-
-    public class UserDetails
-    {
-        public List<UserModel> users { get; set; }
+        public List<UserModel> data { get; set; }
     }
 
     #endregion
@@ -131,16 +100,12 @@ namespace InstitutionService.Models
     public class ServicesInstitutionsGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public ServicesInstitutionsDetails data { get; set; }
+        public List<ServicesInstitutionsModel> data { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject included { get; set; }
     }
 
-    public class ServicesInstitutionsDetails
-    {
-        public List<ServicesInstitutionsModel> servicesInstitutions { get; set; }
-    }
     #endregion
 
     #region Invitations Response
@@ -149,12 +114,9 @@ namespace InstitutionService.Models
     public class InvitationsGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public InvitationsDetails data { get; set; }
+        public List<InvitationsGetModel> data { get; set; }
     }
 
-    public class InvitationsDetails
-    {
-        public List<InvitationsGetModel> Invitations { get; set; }
-    }
+ 
     #endregion
 }

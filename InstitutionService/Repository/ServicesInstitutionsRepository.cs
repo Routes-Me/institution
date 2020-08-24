@@ -51,7 +51,7 @@ namespace InstitutionService.Repository
                     return response;
                 }
 
-                var servicesinstitutions = _context.Servicesinstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).FirstOrDefault();
+                var servicesinstitutions = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).FirstOrDefault();
                 if (servicesinstitutions == null)
                 {
                     response.status = false;
@@ -59,7 +59,7 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                 }
 
-                _context.Servicesinstitutions.Remove(servicesinstitutions);
+                _context.ServicesInstitutions.Remove(servicesinstitutions);
                 _context.SaveChanges();
                 response.status = true;
                 response.message = "Services institutions deleted successfully.";
@@ -78,7 +78,6 @@ namespace InstitutionService.Repository
         public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, string includeType, Pagination pageInfo)
         {
             ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-            ServicesInstitutionsDetails servicesInstitutionsDetails = new ServicesInstitutionsDetails();
             int totalCount = 0;
             try
             {
@@ -110,7 +109,7 @@ namespace InstitutionService.Repository
                 List<ServicesInstitutionsModel> objServicesInstitutionsModel = new List<ServicesInstitutionsModel>();
                 if (serviceId == 0)
                 {
-                    objServicesInstitutionsModel = (from servicesinstitution in _context.Servicesinstitutions
+                    objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
                                                     where servicesinstitution.InstitutionId == institutionId
                                                     select new ServicesInstitutionsModel()
                                                     {
@@ -118,11 +117,11 @@ namespace InstitutionService.Repository
                                                         ServiceId = servicesinstitution.ServiceId
                                                     }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Servicesinstitutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
                 }
                 else
                 {
-                    objServicesInstitutionsModel = (from servicesinstitution in _context.Servicesinstitutions
+                    objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
                                                     where servicesinstitution.InstitutionId == institutionId && servicesinstitution.ServiceId == serviceId
                                                     select new ServicesInstitutionsModel()
                                                     {
@@ -130,7 +129,7 @@ namespace InstitutionService.Repository
                                                         ServiceId = servicesinstitution.ServiceId
                                                     }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Servicesinstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).ToList().Count();
                 }
 
                 if (objServicesInstitutionsModel == null || objServicesInstitutionsModel.Count == 0)
@@ -142,7 +141,6 @@ namespace InstitutionService.Repository
                     return response;
                 }
 
-                servicesInstitutionsDetails.servicesInstitutions = objServicesInstitutionsModel;
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -177,7 +175,7 @@ namespace InstitutionService.Repository
                 response.status = true;
                 response.message = "Services institutions data retrived successfully.";
                 response.pagination = page;
-                response.data = servicesInstitutionsDetails;
+                response.data = objServicesInstitutionsModel;
                 response.included = includeData;
                 response.responseCode = ResponseCode.Success;
                 return response;
@@ -222,12 +220,12 @@ namespace InstitutionService.Repository
                     return response;
                 }
 
-                Servicesinstitutions objServicesinstitutions = new Servicesinstitutions()
+                ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
                 {
                     InstitutionId = institutionsId,
                     ServiceId = model.ServiceId
                 };
-                _context.Servicesinstitutions.Add(objServicesinstitutions);
+                _context.ServicesInstitutions.Add(objServicesinstitutions);
                 _context.SaveChanges();
                 response.status = true;
                 response.message = "Services institutions inserted successfully.";
@@ -248,27 +246,27 @@ namespace InstitutionService.Repository
             ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
             try
             {
-                if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                //if (model == null)
+                //{
+                //    response.status = false;
+                //    response.message = "Pass valid data in model.";
+                //    response.responseCode = ResponseCode.BadRequest;
+                //    return response;
+                //}
 
-                var servicesinstitutions = _context.Servicesinstitutions.Where(x => x.Id == model.id).FirstOrDefault();
-                if (servicesinstitutions == null)
-                {
-                    response.status = false;
-                    response.message = "Services institutions not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                //var servicesinstitutions = _context.ServicesInstitutions.Where(x => x.Id == model.id).FirstOrDefault();
+                //if (servicesinstitutions == null)
+                //{
+                //    response.status = false;
+                //    response.message = "Services institutions not found.";
+                //    response.responseCode = ResponseCode.NotFound;
+                //    return response;
+                //}
 
-                servicesinstitutions.ServiceId = model.ServiceId;
-                servicesinstitutions.InstitutionId = institutionsId;
-                _context.Servicesinstitutions.Update(servicesinstitutions);
-                _context.SaveChanges();
+                //servicesinstitutions.ServiceId = model.ServiceId;
+                //servicesinstitutions.InstitutionId = institutionsId;
+                //_context.ServicesInstitutions.Update(servicesinstitutions);
+                //_context.SaveChanges();
 
                 response.status = true;
                 response.message = "Services institutions updated successfully.";

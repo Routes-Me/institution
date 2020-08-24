@@ -19,7 +19,7 @@ namespace InstitutionService.Models.DBModels
         public virtual DbSet<Invitations> Invitations { get; set; }
         public virtual DbSet<Officers> Officers { get; set; }
         public virtual DbSet<Services> Services { get; set; }
-        public virtual DbSet<Servicesinstitutions> Servicesinstitutions { get; set; }
+        public virtual DbSet<ServicesInstitutions> ServicesInstitutions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -39,16 +39,16 @@ namespace InstitutionService.Models.DBModels
 
                 entity.ToTable("institutions");
 
-                entity.Property(e => e.InstitutionId).HasColumnName("institutionId");
+                entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
 
                 entity.Property(e => e.CountryIso)
-                    .HasColumnName("countryIso")
+                    .HasColumnName("country_iso")
                     .HasColumnType("char(2)")
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnName("createdAt")
+                    .HasColumnName("created_at")
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
@@ -57,7 +57,11 @@ namespace InstitutionService.Models.DBModels
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
 
-                entity.Property(e => e.PhoneNumber).HasColumnName("phoneNumber");
+                entity.Property(e => e.PhoneNumber)
+                    .HasColumnName("phone_number")
+                    .HasColumnType("varchar(15)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
             });
 
             modelBuilder.Entity<Invitations>(entity =>
@@ -68,9 +72,9 @@ namespace InstitutionService.Models.DBModels
                 entity.ToTable("invitations");
 
                 entity.HasIndex(e => e.OfficerId)
-                    .HasName("officerId");
+                    .HasName("officer_id");
 
-                entity.Property(e => e.InvitationId).HasColumnName("invitationId");
+                entity.Property(e => e.InvitationId).HasColumnName("invitation_id");
 
                 entity.Property(e => e.Address)
                     .HasColumnName("address")
@@ -88,10 +92,10 @@ namespace InstitutionService.Models.DBModels
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
 
-                entity.Property(e => e.OfficerId).HasColumnName("officerId");
+                entity.Property(e => e.OfficerId).HasColumnName("officer_id");
 
                 entity.Property(e => e.RecipientName)
-                    .HasColumnName("recipientName")
+                    .HasColumnName("recipient_name")
                     .HasColumnType("varchar(255)")
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
@@ -110,13 +114,13 @@ namespace InstitutionService.Models.DBModels
                 entity.ToTable("officers");
 
                 entity.HasIndex(e => e.InstitutionId)
-                    .HasName("institutionId");
+                    .HasName("institution_id");
 
-                entity.Property(e => e.OfficerId).HasColumnName("officerId");
+                entity.Property(e => e.OfficerId).HasColumnName("officer_id");
 
-                entity.Property(e => e.InstitutionId).HasColumnName("institutionId");
+                entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
 
-                entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.Institution)
                     .WithMany(p => p.Officers)
@@ -131,10 +135,10 @@ namespace InstitutionService.Models.DBModels
 
                 entity.ToTable("services");
 
-                entity.Property(e => e.ServiceId).HasColumnName("serviceId");
+                entity.Property(e => e.ServiceId).HasColumnName("service_id");
 
-                entity.Property(e => e.Description)
-                    .HasColumnName("description")
+                entity.Property(e => e.Descriptions)
+                    .HasColumnName("descriptions")
                     .HasColumnType("varchar(255)")
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
@@ -146,41 +150,31 @@ namespace InstitutionService.Models.DBModels
                     .HasCollation("utf8mb4_0900_ai_ci");
             });
 
-            modelBuilder.Entity<Servicesinstitutions>(entity =>
+            modelBuilder.Entity<ServicesInstitutions>(entity =>
             {
-                entity.HasKey(e => new { e.Id, e.InstitutionId, e.ServiceId })
+                entity.HasKey(e => new { e.InstitutionId, e.ServiceId })
                     .HasName("PRIMARY");
 
-                entity.ToTable("servicesinstitutions");
-
-                entity.HasIndex(e => e.Id)
-                    .HasName("id");
-
-                entity.HasIndex(e => e.InstitutionId)
-                    .HasName("servicesinstitutions_ibfk_1");
+                entity.ToTable("services_institutions");
 
                 entity.HasIndex(e => e.ServiceId)
-                    .HasName("servicesinstitutions_ibfk_2");
+                    .HasName("service_id");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
 
-                entity.Property(e => e.InstitutionId).HasColumnName("institutionId");
-
-                entity.Property(e => e.ServiceId).HasColumnName("serviceId");
+                entity.Property(e => e.ServiceId).HasColumnName("service_id");
 
                 entity.HasOne(d => d.Institution)
-                    .WithMany(p => p.Servicesinstitutions)
+                    .WithMany(p => p.ServicesInstitutions)
                     .HasForeignKey(d => d.InstitutionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("servicesinstitutions_ibfk_1");
+                    .HasConstraintName("services_institutions_ibfk_1");
 
                 entity.HasOne(d => d.Service)
-                    .WithMany(p => p.Servicesinstitutions)
+                    .WithMany(p => p.ServicesInstitutions)
                     .HasForeignKey(d => d.ServiceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("servicesinstitutions_ibfk_2");
+                    .HasConstraintName("services_institutions_ibfk_2");
             });
 
             OnModelCreatingPartial(modelBuilder);

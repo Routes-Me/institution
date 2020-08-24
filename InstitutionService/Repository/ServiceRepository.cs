@@ -28,12 +28,12 @@ namespace InstitutionService.Repository
                     response.message = "Service not found.";
                     response.responseCode = ResponseCode.NotFound;
                 }
-                var servicesInstitutions = _context.Servicesinstitutions.Where(x => x.ServiceId == id).ToList();
+                var servicesInstitutions = _context.ServicesInstitutions.Where(x => x.ServiceId == id).ToList();
                 if (servicesInstitutions != null)
                 {
                     foreach (var item in servicesInstitutions)
                     {
-                        _context.Servicesinstitutions.Remove(item);
+                        _context.ServicesInstitutions.Remove(item);
                         _context.SaveChanges();
                     }
                 }
@@ -56,7 +56,6 @@ namespace InstitutionService.Repository
         public ServicesGetResponse GetServices(int servicesId, Pagination pageInfo)
         {
             ServicesGetResponse response = new ServicesGetResponse();
-            ServicesDetails servicesDetails = new ServicesDetails();
             int totalCount = 0;
             try
             {
@@ -68,7 +67,7 @@ namespace InstitutionService.Repository
                                             {
                                                 ServiceId = services.ServiceId,
                                                 Name = services.Name,
-                                                Description = services.Description,
+                                                Description = services.Descriptions,
                                             }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Services.ToList().Count();
@@ -81,7 +80,7 @@ namespace InstitutionService.Repository
                                             {
                                                 ServiceId = services.ServiceId,
                                                 Name = services.Name,
-                                                Description = services.Description,
+                                                Description = services.Descriptions,
                                             }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Services.Where(x => x.ServiceId == servicesId).ToList().Count();
@@ -94,7 +93,6 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                     return response;
                 }
-                servicesDetails.services = objServicesModelList;
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -104,7 +102,7 @@ namespace InstitutionService.Repository
                 response.status = true;
                 response.message = "Services data retrived successfully.";
                 response.pagination = page;
-                response.data = servicesDetails;
+                response.data = objServicesModelList;
                 response.responseCode = ResponseCode.Success;
                 return response;
             }
@@ -133,7 +131,7 @@ namespace InstitutionService.Repository
                 Services objServices = new Services()
                 {
                     Name = model.Name,
-                    Description = model.Description,
+                    Descriptions = model.Description,
                 };
                 _context.Services.Add(objServices);
                 _context.SaveChanges();
@@ -173,7 +171,7 @@ namespace InstitutionService.Repository
                     return response;
                 }
                 servicesData.Name = model.Name;
-                servicesData.Description = model.Description;
+                servicesData.Descriptions = model.Description;
                 _context.Services.Update(servicesData);
                 _context.SaveChanges();
                 response.status = true;

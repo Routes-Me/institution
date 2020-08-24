@@ -67,7 +67,6 @@ namespace InstitutionService.Repository
         public InvitationsGetResponse GetInvitation(int invitationId, Pagination pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
-            InvitationsDetails invitationsDetails = new InvitationsDetails();
             int totalCount = 0;
             try
             {
@@ -112,7 +111,6 @@ namespace InstitutionService.Repository
                     response.responseCode = ResponseCode.NotFound;
                     return response;
                 }
-                invitationsDetails.Invitations = objInvitationsModelList;
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -123,7 +121,7 @@ namespace InstitutionService.Repository
                 response.status = true;
                 response.message = "Invitations data retrived successfully.";
                 response.pagination = page;
-                response.data = invitationsDetails;
+                response.data = objInvitationsModelList;
                 response.responseCode = ResponseCode.Success;
                 return response;
             }

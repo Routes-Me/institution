@@ -7,13 +7,13 @@ namespace InstitutionService.Models.DBModels
     {
         public Services()
         {
-            Servicesinstitutions = new HashSet<Servicesinstitutions>();
+            ServicesInstitutions = new HashSet<ServicesInstitutions>();
         }
 
         public int ServiceId { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string Descriptions { get; set; }
 
-        public virtual ICollection<Servicesinstitutions> Servicesinstitutions { get; set; }
+        public virtual ICollection<ServicesInstitutions> ServicesInstitutions { get; set; }
     }
 }
