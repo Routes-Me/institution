@@ -56,9 +56,6 @@ namespace InstitutionService
             services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
             services.AddScoped<IInstitutionIncludedRepository, InstitutionIncludedRepository>();
             
-
-
-
             services.AddSingleton<IMessageSender>(new MessageSender(
                 Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
 
