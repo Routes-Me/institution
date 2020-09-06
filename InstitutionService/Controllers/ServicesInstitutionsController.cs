@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using InstitutionService.Abstraction;
+﻿using InstitutionService.Abstraction;
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InstitutionService.Controllers

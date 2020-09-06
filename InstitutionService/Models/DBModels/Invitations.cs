@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace InstitutionService.Models.DBModels
+﻿namespace InstitutionService.Models.DBModels
 {
     public partial class Invitations
     {

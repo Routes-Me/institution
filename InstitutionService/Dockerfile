@@ -2,13 +2,13 @@
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
-EXPOSE 80
+EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["InstitutionService/InstitutionService.csproj", "InstitutionService/"]
 RUN dotnet restore "InstitutionService/InstitutionService.csproj"
-COPY . .
+COPY ./ .
 WORKDIR "/src/InstitutionService"
 RUN dotnet build "InstitutionService.csproj" -c Release -o /app/build
 

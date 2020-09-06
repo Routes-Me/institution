@@ -3,10 +3,8 @@ using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace InstitutionService.Helper.Repository
 {

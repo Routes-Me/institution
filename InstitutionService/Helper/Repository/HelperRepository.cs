@@ -1,12 +1,8 @@
 ﻿using InstitutionService.Helper.Abstraction;
 using InstitutionService.Helper.Models;
-using InstitutionService.Models;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace InstitutionService.Helper.Repository
