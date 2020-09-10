@@ -1,4 +1,5 @@
 ﻿using InstitutionService.Helper.Abstraction;
+using InstitutionService.Helper.Functions;
 using InstitutionService.Helper.Models;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
@@ -42,13 +43,7 @@ namespace InstitutionService.Helper.Repository
                 }
             }
             var institutionsList = lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
-            var institutionsJson = JsonConvert.SerializeObject(institutionsList,
-                                  new JsonSerializerSettings
-                                  {
-                                      NullValueHandling = NullValueHandling.Ignore,
-                                  });
-
-            return JArray.Parse(institutionsJson);
+            return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
         }
 
         public dynamic GetUsersIncludedData(List<OfficersModel> objOfficersModelList)
@@ -67,13 +62,7 @@ namespace InstitutionService.Helper.Repository
                 }
             }
             var usersList = lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
-            var usersJson = JsonConvert.SerializeObject(usersList,
-                                   new JsonSerializerSettings
-                                   {
-                                       NullValueHandling = NullValueHandling.Ignore,
-                                   });
-
-            return JArray.Parse(usersJson);
+            return Common.SerializeJsonForIncludedRepo(usersList.Cast<dynamic>().ToList());
         }
     }
 }

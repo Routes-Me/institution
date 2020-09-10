@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using InstitutionService.Helper.Abstraction;
 using System.Net;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace InstitutionService.Repository
 {
@@ -25,45 +27,29 @@ namespace InstitutionService.Repository
             _messageSender = messageSender;
         }
 
-        public InvitationsResponse DeleteInvitation(int officerId, int id)
+        public dynamic DeleteInvitation(int officerId, int id)
         {
-            InvitationsResponse response = new InvitationsResponse();
             try
             {
-                var officer = _context.Officers.Where(x => x.OfficerId == officerId).FirstOrDefault();
+                var officer = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerId).FirstOrDefault();
                 if (officer == null)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                var invitation = _context.Invitations.Where(x => x.InvitationId == id && x.OfficerId == officerId).FirstOrDefault();
+                var invitation = officer.Invitations.Where(x => x.InvitationId == id && x.OfficerId == officerId).FirstOrDefault();
                 if (invitation == null)
-                {
-                    response.status = false;
-                    response.message = "Invitation not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
 
                 _context.Invitations.Remove(invitation);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Invitation deleted successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.InvitationDelete, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while deleting invitation. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public InvitationsGetResponse GetInvitation(int invitationId, Pagination pageInfo)
+        public dynamic GetInvitation(int invitationId, Pagination pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
             int totalCount = 0;
@@ -103,13 +89,8 @@ namespace InstitutionService.Repository
                     totalCount = _context.Invitations.Where(x => x.InvitationId == invitationId).ToList().Count();
                 }
                 if (objInvitationsModelList == null || objInvitationsModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Invitations not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
+
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -118,63 +99,36 @@ namespace InstitutionService.Repository
                 };
 
                 response.status = true;
-                response.message = "Invitations data retrived successfully.";
+                response.message = CommonMessage.InvitationRetrived;
                 response.pagination = page;
                 response.data = objInvitationsModelList;
-                response.responseCode = ResponseCode.Success;
+                response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while fetching invitations. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public async Task<InvitationsResponse> InsertInvitation(int OfficerId, InvitationsModel model)
+        public async Task<dynamic> InsertInvitation(int OfficerId, InvitationsModel model)
         {
-            InvitationsResponse response = new InvitationsResponse();
             try
             {
                 byte[] Data;
                 string Address = string.Empty, Hash = string.Empty;
                 bool IsEmail = false;
 
-                if (OfficerId == 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid officerid.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
-
                 var officer = _context.Officers.Where(x => x.OfficerId == OfficerId).FirstOrDefault();
                 if (officer == null)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
                 if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 if (string.IsNullOrEmpty(model.Email) && string.IsNullOrEmpty(model.Phone))
-                {
-                    response.status = false;
-                    response.message = "Pass valid email or phone in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
+                
                 if (string.IsNullOrEmpty(model.Email))
                 {
                     Address = model.Phone;
@@ -188,15 +142,10 @@ namespace InstitutionService.Repository
 
                 var institution = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
                 if (institution == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
 
                 Data = Encoding.ASCII.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(model));
-                Invitations objInvitations = new Invitations()
+                Invitations invitation = new Invitations()
                 {
                     OfficerId = OfficerId,
                     Address = Address,
@@ -204,42 +153,31 @@ namespace InstitutionService.Repository
                     Data = Data
                 };
 
-                _context.Invitations.Add(objInvitations);
+                _context.Invitations.Add(invitation);
                 _context.SaveChanges();
 
-                var encryptedInstitutionId = CryptographyHelper.Encrypt(objInvitations.InvitationId.ToString());
+                var encryptedInstitutionId = CryptographyHelper.Encrypt(invitation.InvitationId.ToString());
 
-                objInvitations.Link = "routesdashboard.com?invitationid=" + encryptedInstitutionId;
-                _context.Invitations.Update(objInvitations);
+                invitation.Link = "routesdashboard.com?invitationid=" + encryptedInstitutionId;
+                _context.Invitations.Update(invitation);
                 _context.SaveChanges();
 
                 if (IsEmail)
                 {
-                    var res = await _helperRepository.SendEmail(objInvitations.Link, model.Email);
+                    var res = await _helperRepository.SendEmail(invitation.Link, model.Email);
                     if (res.StatusCode != HttpStatusCode.Accepted)
-                    {
-                        response.status = false;
-                        response.message = "Something went wrong while sending invitation email. Error Message -" + res.Body.ReadAsStringAsync();
-                        response.responseCode = ResponseCode.InternalServerError;
-                        return response;
-                    }
+                        throw new Exception(res.Body.ReadAsStringAsync().ToString());
                 }
                 else
                 {
-                    var res = await _messageSender.SendMessage(model.Phone, "Invitation Link: " + objInvitations.Link);
+                    var res = await _messageSender.SendMessage(model.Phone, "Invitation Link: " + invitation.Link);
                 }
 
-                response.status = true;
-                response.message = "Invitation sent successfully.";
-                response.responseCode = ResponseCode.Created;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.InvitationInsert, true);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while sending invitation. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
     }

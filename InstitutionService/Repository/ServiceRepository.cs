@@ -2,6 +2,8 @@
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,49 +17,34 @@ namespace InstitutionService.Repository
         {
             _context = context;
         }
-        public ServicesResponse DeleteService(int id)
+        public dynamic DeleteService(int id)
         {
-            ServicesResponse response = new ServicesResponse();
             try
             {
-                var servicesData = _context.Services.Where(x => x.ServiceId == id).FirstOrDefault();
-                if (servicesData == null)
+                var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == id).FirstOrDefault();
+                if (service == null)
+                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
+                
+                if (service.ServicesInstitutions != null && service.ServicesInstitutions.Count > 0)
                 {
-                    response.status = false;
-                    response.message = "Service not found.";
-                    response.responseCode = ResponseCode.NotFound;
+                    _context.ServicesInstitutions.RemoveRange(service.ServicesInstitutions);
+                    _context.SaveChanges();
                 }
-                var servicesInstitutions = _context.ServicesInstitutions.Where(x => x.ServiceId == id).ToList();
-                if (servicesInstitutions != null)
-                {
-                    foreach (var item in servicesInstitutions)
-                    {
-                        _context.ServicesInstitutions.Remove(item);
-                        _context.SaveChanges();
-                    }
-                }
-                _context.Services.Remove(servicesData);
+                _context.Services.Remove(service);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Service deleted successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.ServiceDelete, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while deleting service. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
-        public ServicesGetResponse GetServices(int servicesId, Pagination pageInfo)
+        public dynamic GetServices(int servicesId, Pagination pageInfo)
         {
-            ServicesGetResponse response = new ServicesGetResponse();
-            int totalCount = 0;
             try
             {
+                int totalCount = 0;
+                ServicesGetResponse response = new ServicesGetResponse();
                 List<ServicesModel> objServicesModelList = new List<ServicesModel>();
                 if (servicesId == 0)
                 {
@@ -85,13 +72,8 @@ namespace InstitutionService.Repository
                     totalCount = _context.Services.Where(x => x.ServiceId == servicesId).ToList().Count();
                 }
                 if (objServicesModelList == null || objServicesModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Services not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
+                
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -99,34 +81,24 @@ namespace InstitutionService.Repository
                     total = totalCount
                 };
                 response.status = true;
-                response.message = "Services data retrived successfully.";
+                response.message = CommonMessage.ServiceRetrived;
                 response.pagination = page;
                 response.data = objServicesModelList;
-                response.responseCode = ResponseCode.Success;
+                response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while fetching services. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
-        public ServicesResponse InsertService(ServicesModel model)
+        public dynamic InsertService(ServicesModel model)
         {
-            ServicesResponse response = new ServicesResponse();
             try
             {
                 if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
+                
                 Services objServices = new Services()
                 {
                     Name = model.Name,
@@ -134,56 +106,30 @@ namespace InstitutionService.Repository
                 };
                 _context.Services.Add(objServices);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Service inserted successfully.";
-                response.responseCode = ResponseCode.Created;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.ServiceInsert, true);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while inserting service. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
-        public ServicesResponse UpdateService(ServicesModel model)
+        public dynamic UpdateService(ServicesModel model)
         {
-            ServicesResponse response = new ServicesResponse();
             try
             {
-                if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
-
                 var servicesData = _context.Services.Where(x => x.ServiceId == model.ServiceId).FirstOrDefault();
                 if (servicesData == null)
-                {
-                    response.status = false;
-                    response.message = "Service does not exist.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
+
                 servicesData.Name = model.Name;
                 servicesData.Descriptions = model.Description;
                 _context.Services.Update(servicesData);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Service updated successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.ServiceUpdate, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while updating service. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
     }

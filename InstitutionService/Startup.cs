@@ -19,7 +19,6 @@ namespace InstitutionService
         {
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -32,7 +31,7 @@ namespace InstitutionService
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
-            services.AddDbContext<InstitutionService.Models.DBModels.institutionserviceContext>(options =>
+            services.AddDbContext<Models.DBModels.institutionserviceContext>(options =>
             {
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
             });
@@ -48,7 +47,7 @@ namespace InstitutionService
             services.AddScoped<IServiceInstitutionIncludedRepository, ServiceInstitutionIncludedRepository>();
             services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
             services.AddScoped<IInstitutionIncludedRepository, InstitutionIncludedRepository>();
-            
+
             services.AddSingleton<IMessageSender>(new MessageSender(
                 Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
 

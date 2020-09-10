@@ -7,6 +7,8 @@ using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
 using Newtonsoft.Json.Linq;
 using InstitutionService.Helper.Abstraction;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace InstitutionService.Repository
 {
@@ -20,51 +22,35 @@ namespace InstitutionService.Repository
             _officersIncludedRepository = officersIncludedRepository;
         }
 
-        public OfficersResponse DeleteOfficers(int officerId)
+        public dynamic DeleteOfficers(int officerId)
         {
-            OfficersResponse response = new OfficersResponse();
             try
             {
-                var officers = _context.Officers.Where(x => x.OfficerId == officerId).FirstOrDefault();
+                var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerId).FirstOrDefault();
                 if (officers == null)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                var invitations = _context.Invitations.Where(x => x.OfficerId == officerId).ToList();
-                if (invitations != null)
+                if(officers.Invitations != null)
                 {
-                    foreach (var item in invitations)
-                    {
-                        _context.Invitations.Remove(item);
-                        _context.SaveChanges();
-                    }
+                    _context.Invitations.RemoveRange(officers.Invitations);
+                    _context.SaveChanges();
                 }
-
                 _context.Officers.Remove(officers);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Officer deleted successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.OfficerDelete, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while deleting officer. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public OfficersGetResponse GetOfficers(int officerId, string includeType, Pagination pageInfo)
+        public dynamic GetOfficers(int officerId, string includeType, Pagination pageInfo)
         {
-            OfficersGetResponse response = new OfficersGetResponse();
-            int totalCount = 0;
             try
             {
+                int totalCount = 0;
+                OfficersGetResponse response = new OfficersGetResponse();
                 List<OfficersModel> objOfficersModelList = new List<OfficersModel>();
                 if (officerId == 0)
                 {
@@ -93,13 +79,7 @@ namespace InstitutionService.Repository
                 }
 
                 if (objOfficersModelList == null || objOfficersModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {
@@ -132,44 +112,29 @@ namespace InstitutionService.Repository
                     includeData = null;
 
                 response.status = true;
-                response.message = "Officers data retrived successfully.";
+                response.message = CommonMessage.OfficerRetrived;
                 response.pagination = page;
                 response.data = objOfficersModelList;
                 response.included = includeData;
-                response.responseCode = ResponseCode.Success;
+                response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while fetching data. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public OfficersResponse InsertOfficers(OfficersModel model)
+        public dynamic InsertOfficers(OfficersModel model)
         {
-            OfficersResponse response = new OfficersResponse();
             try
             {
                 if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
                 if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 Officers objOfficers = new Officers()
                 {
@@ -178,67 +143,38 @@ namespace InstitutionService.Repository
                 };
                 _context.Officers.Add(objOfficers);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Officers inserted successfully.";
-                response.responseCode = ResponseCode.Created;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.OfficerInsert, true);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while inserting officers. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public OfficersResponse UpdateOfficers(OfficersModel model)
+        public dynamic UpdateOfficers(OfficersModel model)
         {
-            OfficersResponse response = new OfficersResponse();
             try
             {
                 if (model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var officers = _context.Officers.Where(x => x.OfficerId == model.OfficerId).FirstOrDefault();
+                var officers = _context.Officers.Include(x => x.Institution).Where(x => x.OfficerId == model.OfficerId).FirstOrDefault();
                 if (officers == null)
-                {
-                    response.status = false;
-                    response.message = "Officer not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
                 var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
                 if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 officers.InstitutionId = model.InstitutionId;
                 officers.UserId = model.UserId;
                 _context.Officers.Update(officers);
                 _context.SaveChanges();
-
-                response.status = true;
-                response.message = "Officer updated successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.OfficerUpdate, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while updating officer. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
     }

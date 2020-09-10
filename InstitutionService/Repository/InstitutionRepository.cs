@@ -3,6 +3,8 @@ using InstitutionService.Helper.Abstraction;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -20,18 +22,13 @@ namespace InstitutionService.Repository
             _institutionIncludedRepository = institutionIncludedRepository;
         }
 
-        public InstitutionResponse InsertInstitutions(InstitutionsModel Model)
+        public dynamic InsertInstitutions(InstitutionsModel Model)
         {
-            InstitutionResponse response = new InstitutionResponse();
             try
             {
                 if (Model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
+                
                 Institutions objInstitutions = new Institutions()
                 {
                     Name = Model.Name,
@@ -56,121 +53,73 @@ namespace InstitutionService.Repository
                         _context.SaveChanges();
                     }
                 }
-
-                response.status = true;
-                response.message = "Institution inserted successfully.";
-                response.responseCode = ResponseCode.Created;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.InstitutionInsert, true);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while inserting institution. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public InstitutionResponse UpdateInstitution(InstitutionsModel Model)
+        public dynamic UpdateInstitution(InstitutionsModel Model)
         {
-            InstitutionResponse response = new InstitutionResponse();
             try
             {
                 if (Model == null)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var institutionsData = _context.Institutions.Where(x => x.InstitutionId == Model.InstitutionId).FirstOrDefault();
-                if (institutionsData == null)
-                {
-                    response.status = false;
-                    response.message = "Institutions does not exist.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                var institution = _context.Institutions.Where(x => x.InstitutionId == Model.InstitutionId).FirstOrDefault();
+                if (institution == null)
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                institutionsData.Name = Model.Name;
-                institutionsData.CreatedAt = DateTime.UtcNow;
-                institutionsData.PhoneNumber = Model.PhoneNumber;
-                institutionsData.CountryIso = Model.CountryIso;
-
-                _context.Institutions.Update(institutionsData);
+                institution.Name = Model.Name;
+                institution.CreatedAt = DateTime.UtcNow;
+                institution.PhoneNumber = Model.PhoneNumber;
+                institution.CountryIso = Model.CountryIso;
+                _context.Institutions.Update(institution);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Institution updated successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.InstitutionUpdate, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while updating institution. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public InstitutionResponse DeleteInstitution(int id)
+        public dynamic DeleteInstitution(int id)
         {
-            InstitutionResponse response = new InstitutionResponse();
             try
             {
-                var institutionData = _context.Institutions.Where(x => x.InstitutionId == id).FirstOrDefault();
-                if (institutionData == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                }
+                var institution = _context.Institutions.Include(x => x.Officers).Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == id).FirstOrDefault();
+                if (institution == null)
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                //var vehicleData = _context.Vehicles.Where(x => x.InstitutionId == id).FirstOrDefault();
-                //if (vehicleData != null)
-                //{
-                //    response.status = false;
-                //    response.message = "Institution associated with other vehicles.";
-                //    response.institutionDetails = null;
-                //    response.responseCode = ResponseCode.Conflict;
-                //}
-                //var driversData = _context.Drivers.Where(x => x.InstitutionId == id).FirstOrDefault();
-                //if (driversData != null)
-                //{
-                //    response.status = false;
-                //    response.message = "Institution associated with other drivers.";
-                //    response.institutionDetails = null;
-                //    response.responseCode = ResponseCode.Conflict;
-                //}
-                var officersData = _context.Officers.Where(x => x.InstitutionId == id).FirstOrDefault();
-                if (officersData != null)
+                if (institution.Officers != null && institution.Officers.Count > 0)
                 {
-                    _context.Officers.Remove(officersData);
+                    _context.Officers.RemoveRange(institution.Officers);
                     _context.SaveChanges();
                 }
-                _context.Institutions.Remove(institutionData);
+                if (institution.ServicesInstitutions != null && institution.ServicesInstitutions.Count > 0)
+                {
+                    _context.ServicesInstitutions.RemoveRange(institution.ServicesInstitutions);
+                    _context.SaveChanges();
+                }
+                _context.Institutions.Remove(institution);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Institution deleted successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.InstitutionDelete, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while deleting institution. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
 
-        public InstitutionGetResponse GetInstitutions(int institutionId, string includeType, Pagination pageInfo)
+        public dynamic GetInstitutions(int institutionId, string includeType, Pagination pageInfo)
         {
-            InstitutionGetResponse response = new InstitutionGetResponse();
-            int totalCount = 0;
             try
             {
+                int totalCount = 0;
+                InstitutionGetResponse response = new InstitutionGetResponse();
                 List<GetInstitutionsModel> objInstitutionsModelList = new List<GetInstitutionsModel>();
                 if (institutionId == 0)
                 {
@@ -202,13 +151,8 @@ namespace InstitutionService.Repository
                     totalCount = _context.Institutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
                 }
                 if (objInstitutionsModelList == null || objInstitutionsModelList.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
+
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
@@ -236,20 +180,16 @@ namespace InstitutionService.Repository
                     includeData = null;
 
                 response.status = true;
-                response.message = "Institutions data retrived successfully.";
+                response.message = CommonMessage.InstitutionRetrived;
                 response.pagination = page;
                 response.data = objInstitutionsModelList;
                 response.included = includeData;
-                response.responseCode = ResponseCode.Success;
+                response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while fetching institutions. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
     }

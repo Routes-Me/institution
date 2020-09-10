@@ -1,5 +1,4 @@
-﻿
-namespace InstitutionService.Models
+﻿namespace InstitutionService.Models
 {
     public class Pagination
     {

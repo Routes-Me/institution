@@ -1,5 +1,4 @@
-﻿
-namespace InstitutionService.Models.DBModels
+﻿namespace InstitutionService.Models.DBModels
 {
     public partial class ServicesInstitutions
     {

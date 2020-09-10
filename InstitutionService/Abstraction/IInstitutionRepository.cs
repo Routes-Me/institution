@@ -5,9 +5,9 @@ namespace InstitutionService.Abstraction
 {
     public interface IInstitutionRepository
     {
-        InstitutionResponse InsertInstitutions(InstitutionsModel institutionModel);
-        InstitutionResponse UpdateInstitution(InstitutionsModel institutionModel);
-        InstitutionResponse DeleteInstitution(int id);
-        InstitutionGetResponse GetInstitutions(int institutionId, string include, Pagination pageInfo);
+        dynamic InsertInstitutions(InstitutionsModel institutionModel);
+        dynamic UpdateInstitution(InstitutionsModel institutionModel);
+        dynamic DeleteInstitution(int id);
+        dynamic GetInstitutions(int institutionId, string include, Pagination pageInfo);
     }
 }

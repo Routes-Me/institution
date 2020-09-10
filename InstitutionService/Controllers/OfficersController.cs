@@ -7,7 +7,7 @@ namespace InstitutionService.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class OfficersController : BaseController
+    public class OfficersController : ControllerBase
     {
         private readonly IOfficersRepository _officersRepository;
         public OfficersController(IOfficersRepository officersRepository)
@@ -19,47 +19,32 @@ namespace InstitutionService.Controllers
         [Route("officers")]
         public IActionResult Post(OfficersModel Model)
         {
-            OfficersResponse response = new OfficersResponse();
-            if (ModelState.IsValid)
-                response = _officersRepository.InsertOfficers(Model);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _officersRepository.InsertOfficers(Model);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpPut]
         [Route("officers")]
         public IActionResult Put(OfficersModel Model)
         {
-            OfficersResponse response = new OfficersResponse();
-            if (ModelState.IsValid)
-                response = _officersRepository.UpdateOfficers(Model);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _officersRepository.UpdateOfficers(Model);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpDelete]
         [Route("officers/{officersId}")]
         public IActionResult Delete(int officersId) 
         {
-            OfficersResponse response = new OfficersResponse();
-            if (ModelState.IsValid)
-                response = _officersRepository.DeleteOfficers(officersId);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _officersRepository.DeleteOfficers(officersId);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpGet]
         [Route("officers/{officersId=0}")]
         public IActionResult Get(int officersId,string include, [FromQuery] Pagination pageInfo)
         {
-            OfficersGetResponse response = new OfficersGetResponse();
-            response = _officersRepository.GetOfficers(officersId, include, pageInfo);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _officersRepository.GetOfficers(officersId, include, pageInfo);
+            return StatusCode((int)response.statusCode, response);
         }
     }
 }

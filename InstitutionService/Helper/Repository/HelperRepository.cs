@@ -9,12 +9,9 @@ namespace InstitutionService.Helper.Repository
 {
     public class HelperRepository : IHelperRepository
     {
-        private readonly AppSettings _appSettings;
         private readonly SendGridSettings _sendGridSettings;
-
-        public HelperRepository(IOptions<AppSettings> appSettings, IOptions<SendGridSettings> sendGridSettings)
+        public HelperRepository(IOptions<SendGridSettings> sendGridSettings)
         {
-            _appSettings = appSettings.Value;
             _sendGridSettings = sendGridSettings.Value;
         }
 

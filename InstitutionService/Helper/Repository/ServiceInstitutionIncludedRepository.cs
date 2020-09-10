@@ -1,4 +1,5 @@
 ﻿using InstitutionService.Helper.Abstraction;
+using InstitutionService.Helper.Functions;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Newtonsoft.Json;
@@ -34,13 +35,7 @@ namespace InstitutionService.Helper.Repository
                 }
             }
             var institutionsList = lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
-            var institutionJson = JsonConvert.SerializeObject(institutionsList,
-                                    new JsonSerializerSettings
-                                    {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                    });
-
-            return JArray.Parse(institutionJson);
+            return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
         }
 
         public dynamic GetServiceIncludedData(List<ServicesInstitutionsModel> objServicesInstitutionsModel)
@@ -60,13 +55,7 @@ namespace InstitutionService.Helper.Repository
                 }
             }
             var servicesList = lstServices.GroupBy(x => x.ServiceId).Select(a => a.First()).ToList();
-            var servicesJson = JsonConvert.SerializeObject(servicesList,
-                                    new JsonSerializerSettings
-                                    {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                    });
-
-            return JArray.Parse(servicesJson);
+            return Common.SerializeJsonForIncludedRepo(servicesList.Cast<dynamic>().ToList());
         }
     }
 }

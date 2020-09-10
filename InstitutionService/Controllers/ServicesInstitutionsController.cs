@@ -7,7 +7,7 @@ namespace InstitutionService.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class ServicesInstitutionsController : BaseController
+    public class ServicesInstitutionsController : ControllerBase
     {
         private readonly IServicesInstitutionsRepository _servicesInstitutionsRepository;
         public ServicesInstitutionsController(IServicesInstitutionsRepository serviceInstitutionRepository)
@@ -19,47 +19,24 @@ namespace InstitutionService.Controllers
         [Route("institutions/{institutionsId=0}/services")]
         public IActionResult Post(int institutionsId, ServicesInstitutionsPostModel Model)
         {
-            ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
-            if (ModelState.IsValid)
-                response = _servicesInstitutionsRepository.InsertServicesInstitutions(institutionsId, Model);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _servicesInstitutionsRepository.InsertServicesInstitutions(institutionsId, Model);
+            return StatusCode((int)response.statusCode, response);
         }
-
-        //[HttpPatch]
-        //[Route("institutions/{institutionsId=0}/services")]
-        //public IActionResult Put(int institutionsId, ServicesInstitutionsPostModel Model)
-        //{
-        //    ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
-        //    if (ModelState.IsValid)
-        //        response = _servicesInstitutionsRepository.UpdateServicesInstitutions(institutionsId, Model);
-        //    if (response.responseCode != ResponseCode.Success)
-        //        return GetActionResult(response);
-        //    return Ok(response);
-        //}
 
         [HttpDelete]
         [Route("institutions/{institutionsId=0}/services/{servicesId}")]
         public IActionResult Delete(int institutionsId, int servicesId)
         {
-            ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
-            if (ModelState.IsValid)
-                response = _servicesInstitutionsRepository.DeleteServicesInstitutions(institutionsId, servicesId);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _servicesInstitutionsRepository.DeleteServicesInstitutions(institutionsId, servicesId);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpGet]
         [Route("institutions/{institutionId=0}/services/{servicesId=0}")]
         public IActionResult Get(int institutionId, int servicesId, string include, [FromQuery] Pagination pageInfo)
         {
-            ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-            response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, servicesId, include,pageInfo);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, servicesId, include, pageInfo);
+            return StatusCode((int)response.statusCode, response);
         }
     }
 }   
