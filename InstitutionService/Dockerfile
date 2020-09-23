@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 EXPOSE 80
+ENV ASPNETCORE_ENVIRONMENT="Production"
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app

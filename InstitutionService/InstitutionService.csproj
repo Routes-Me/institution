@@ -26,6 +26,8 @@
     <None Include="appsettings.Staging.json;appsettings.Production.json">
       <DependentUpon>appsettings.json</DependentUpon>
     </None>
+    <None Include="appsettings.Production.json" CopyToPublishDirectory="Always" />
+
   </ItemGroup>
 
 
