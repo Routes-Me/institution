@@ -3,6 +3,8 @@ using InstitutionService.Helper.Abstraction;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -13,97 +15,43 @@ namespace InstitutionService.Repository
     public class ServicesInstitutionsRepository : IServicesInstitutionsRepository
     {
         private readonly institutionserviceContext _context;
-        private readonly  IServiceInstitutionIncludedRepository _serviceInstitutionIncludedRepository;
+        private readonly IServiceInstitutionIncludedRepository _serviceInstitutionIncludedRepository;
         public ServicesInstitutionsRepository(institutionserviceContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
         {
             _context = context;
             _serviceInstitutionIncludedRepository = serviceInstitutionIncludedRepository;
         }
 
-        public ServicesInstitutionsResponse DeleteServicesInstitutions(int institutionId, int serviceId)
+        public dynamic DeleteServicesInstitutions(int institutionId, int serviceId)
         {
-            ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                var institution = _context.Institutions.Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == institutionId).FirstOrDefault();
+                if (institution == null)
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
-                if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                if (serviceId <= 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
-
-                var servicesinstitutions = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).FirstOrDefault();
+                var servicesinstitutions = institution.ServicesInstitutions.Where(x => x.ServiceId == serviceId).FirstOrDefault();
                 if (servicesinstitutions == null)
-                {
-                    response.status = false;
-                    response.message = "Services institutions not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceInstitutionNotFound, StatusCodes.Status404NotFound);
 
                 _context.ServicesInstitutions.Remove(servicesinstitutions);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Services institutions deleted successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.ServiceInstitutionDelete, false);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while deleting services institutions. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
-        public ServicesInstitutionsGetResponse GetServicesInstitutions(int institutionId, int serviceId, string includeType, Pagination pageInfo)
+        public dynamic GetServicesInstitutions(int institutionId, int serviceId, string includeType, Pagination pageInfo)
         {
-            ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-            int totalCount = 0;
             try
             {
-                if (institutionId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
+                int totalCount = 0;
+                ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
                 var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
                 if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
-                if (serviceId < 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid serviceId.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 List<ServicesInstitutionsModel> objServicesInstitutionsModel = new List<ServicesInstitutionsModel>();
                 if (serviceId == 0)
@@ -132,13 +80,7 @@ namespace InstitutionService.Repository
                 }
 
                 if (objServicesInstitutionsModel == null || objServicesInstitutionsModel.Count == 0)
-                {
-                    response.status = false;
-                    response.message = "Services institutions not found.";
-                    response.data = null;
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceInstitutionNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {
@@ -159,11 +101,10 @@ namespace InstitutionService.Repository
                             {
                                 includeData.institutions = _serviceInstitutionIncludedRepository.GetInstitutionsIncludedData(objServicesInstitutionsModel);
                             }
-                            else if(item.ToLower() == "service" || item.ToLower() == "services")
+                            else if (item.ToLower() == "service" || item.ToLower() == "services")
                             {
                                 includeData.services = _serviceInstitutionIncludedRepository.GetServiceIncludedData(objServicesInstitutionsModel);
                             }
-                             
                         }
                     }
                 }
@@ -172,52 +113,28 @@ namespace InstitutionService.Repository
                     includeData = null;
 
                 response.status = true;
-                response.message = "Services institutions data retrived successfully.";
+                response.message = CommonMessage.ServiceInstitutionRetrived;
                 response.pagination = page;
                 response.data = objServicesInstitutionsModel;
                 response.included = includeData;
-                response.responseCode = ResponseCode.Success;
+                response.statusCode = StatusCodes.Status200OK;
                 return response;
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while fetching data. Error Message - " + ex.Message;
-                response.data = null;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
-        public ServicesInstitutionsResponse InsertServicesInstitutions(int institutionsId, ServicesInstitutionsPostModel model)
+        public dynamic InsertServicesInstitutions(int institutionsId, ServicesInstitutionsPostModel model)
         {
-            ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
             try
             {
-                if (institutionsId == 0)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
-
                 var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionsId).FirstOrDefault();
                 if (InstitutionDetails == null)
-                {
-                    response.status = false;
-                    response.message = "Institution not found.";
-                    response.responseCode = ResponseCode.NotFound;
-                    return response;
-                }
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                if (model == null && model.ServiceId <= 0)
-                {
-                    response.status = false;
-                    response.message = "Pass valid data in model.";
-                    response.responseCode = ResponseCode.BadRequest;
-                    return response;
-                }
+                if (model == null || model.ServiceId <= 0)
+                    return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
                 {
@@ -226,58 +143,11 @@ namespace InstitutionService.Repository
                 };
                 _context.ServicesInstitutions.Add(objServicesinstitutions);
                 _context.SaveChanges();
-                response.status = true;
-                response.message = "Services institutions inserted successfully.";
-                response.responseCode = ResponseCode.Created;
-                return response;
+                return ReturnResponse.SuccessResponse(CommonMessage.ServiceInstitutionInsert, true);
             }
             catch (Exception ex)
             {
-                response.status = false;
-                response.message = "Something went wrong while inserting services institutions. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
-            }
-        }
-
-        public ServicesInstitutionsResponse UpdateServicesInstitutions(int institutionsId, ServicesInstitutionsPostModel model)
-        {
-            ServicesInstitutionsResponse response = new ServicesInstitutionsResponse();
-            try
-            {
-                //if (model == null)
-                //{
-                //    response.status = false;
-                //    response.message = "Pass valid data in model.";
-                //    response.responseCode = ResponseCode.BadRequest;
-                //    return response;
-                //}
-
-                //var servicesinstitutions = _context.ServicesInstitutions.Where(x => x.Id == model.id).FirstOrDefault();
-                //if (servicesinstitutions == null)
-                //{
-                //    response.status = false;
-                //    response.message = "Services institutions not found.";
-                //    response.responseCode = ResponseCode.NotFound;
-                //    return response;
-                //}
-
-                //servicesinstitutions.ServiceId = model.ServiceId;
-                //servicesinstitutions.InstitutionId = institutionsId;
-                //_context.ServicesInstitutions.Update(servicesinstitutions);
-                //_context.SaveChanges();
-
-                response.status = true;
-                response.message = "Services institutions updated successfully.";
-                response.responseCode = ResponseCode.Success;
-                return response;
-            }
-            catch (Exception ex)
-            {
-                response.status = false;
-                response.message = "Something went wrong while updating services institutions. Error Message - " + ex.Message;
-                response.responseCode = ResponseCode.InternalServerError;
-                return response;
+                return ReturnResponse.ExceptionResponse(ex);
             }
         }
     }

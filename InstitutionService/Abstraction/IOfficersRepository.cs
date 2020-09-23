@@ -5,10 +5,10 @@ namespace InstitutionService.Abstraction
 {
     public interface IOfficersRepository
     {
-        OfficersResponse InsertOfficers(OfficersModel Model);
-        OfficersResponse UpdateOfficers(OfficersModel Model);
-        OfficersResponse DeleteOfficers(int officerId);
-        OfficersGetResponse GetOfficers(int officersId,string include, Pagination pageInfo); 
+        dynamic InsertOfficers(OfficersModel Model);
+        dynamic UpdateOfficers(OfficersModel Model);
+        dynamic DeleteOfficers(int officerId);
+        dynamic GetOfficers(int officersId,string include, Pagination pageInfo); 
     }
 }
     

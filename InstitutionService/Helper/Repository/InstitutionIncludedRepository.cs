@@ -1,4 +1,5 @@
 ﻿using InstitutionService.Helper.Abstraction;
+using InstitutionService.Helper.Functions;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Newtonsoft.Json;
@@ -42,13 +43,7 @@ namespace InstitutionService.Helper.Repository
                 }
             }
             var servicesList = lstServices.GroupBy(x => x.ServiceId).Select(a => a.First()).ToList();
-            var servicesJson = JsonConvert.SerializeObject(servicesList,
-                                    new JsonSerializerSettings
-                                    {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                    });
-
-            return JArray.Parse(servicesJson);
+            return Common.SerializeJsonForIncludedRepo(servicesList.Cast<dynamic>().ToList());
         }
     }
 }

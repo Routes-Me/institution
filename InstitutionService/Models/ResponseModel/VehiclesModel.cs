@@ -1,5 +1,4 @@
-﻿
-namespace InstitutionService.Models.ResponseModel
+﻿namespace InstitutionService.Models.ResponseModel
 {
     public class VehiclesModel
     {

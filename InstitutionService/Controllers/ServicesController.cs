@@ -7,7 +7,7 @@ namespace InstitutionService.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class ServicesController : BaseController
+    public class ServicesController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
         public ServicesController(IServiceRepository serviceRepository)
@@ -19,47 +19,32 @@ namespace InstitutionService.Controllers
         [Route("services")]
         public IActionResult Post(ServicesModel Model)
         {
-            ServicesResponse response = new ServicesResponse();
-            if (ModelState.IsValid)
-                response = _serviceRepository.InsertService(Model);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _serviceRepository.InsertService(Model);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpPut]
         [Route("services")]
         public IActionResult Put(ServicesModel Model)
         {
-            ServicesResponse response = new ServicesResponse();
-            if (ModelState.IsValid)
-                response = _serviceRepository.UpdateService(Model);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _serviceRepository.UpdateService(Model);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpDelete]
         [Route("services/{id}")]
         public IActionResult Delete(int id)
         {
-            ServicesResponse response = new ServicesResponse();
-            if (ModelState.IsValid)
-                response = _serviceRepository.DeleteService(id);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _serviceRepository.DeleteService(id);
+            return StatusCode((int)response.statusCode, response);
         }
 
         [HttpGet]   
         [Route("services/{servicesId=0}")]
         public IActionResult Get(int servicesId, [FromQuery] Pagination pageInfo)
         {
-            ServicesGetResponse response = new ServicesGetResponse();
-            response = _serviceRepository.GetServices(servicesId, pageInfo);
-            if (response.responseCode != ResponseCode.Success)
-                return GetActionResult(response);
-            return Ok(response);
+            dynamic response = _serviceRepository.GetServices(servicesId, pageInfo);
+            return StatusCode((int)response.statusCode, response);
         }
     }
 }

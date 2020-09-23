@@ -5,9 +5,9 @@ namespace InstitutionService.Abstraction
 {
     public interface IServiceRepository
     {
-        ServicesResponse InsertService(ServicesModel model);
-        ServicesResponse UpdateService(ServicesModel model);
-        ServicesResponse DeleteService(int id);
-        ServicesGetResponse GetServices(int servicesId, Pagination pageInfo);
+        dynamic InsertService(ServicesModel model);
+        dynamic UpdateService(ServicesModel model);
+        dynamic DeleteService(int id);
+        dynamic GetServices(int servicesId, Pagination pageInfo);
     }
 }
