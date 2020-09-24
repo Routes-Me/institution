@@ -17,7 +17,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("institutions/{institutionId=0}")]
-        public IActionResult GeInstitutions(int institutionId, string include, [FromQuery] Pagination pageInfo)
+        public IActionResult GeInstitutions(string institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
             return StatusCode((int)response.statusCode, response);
@@ -41,7 +41,7 @@ namespace InstitutionService.Controllers
 
         [HttpDelete]
         [Route("institutions/{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string id)
         {
             dynamic response = _institutionRepository.DeleteInstitution(id);
             return StatusCode((int)response.statusCode, response);

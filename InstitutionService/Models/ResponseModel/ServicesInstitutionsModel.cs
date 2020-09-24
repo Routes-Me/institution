@@ -2,13 +2,13 @@
 {
     public class ServicesInstitutionsModel
     {
-        public int InstitutionId { get; set; }
-        public int ServiceId { get; set; }
+        public string InstitutionId { get; set; }
+        public string ServiceId { get; set; }
     }
 
     public class ServicesInstitutionsPostModel
     {
-        public int id { get; set; }
-        public int ServiceId { get; set; }
+        public string id { get; set; }
+        public string ServiceId { get; set; }
     }
 }

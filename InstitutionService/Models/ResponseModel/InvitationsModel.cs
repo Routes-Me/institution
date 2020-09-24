@@ -8,6 +8,6 @@ namespace InstitutionService.Models.ResponseModel
         public string Email { get; set; }
         public string Phone { get; set; }
         public List<int> Roles { get; set; }
-        public int? InstitutionId { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

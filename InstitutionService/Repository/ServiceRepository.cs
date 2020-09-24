@@ -17,11 +17,11 @@ namespace InstitutionService.Repository
         {
             _context = context;
         }
-        public dynamic DeleteService(int id)
+        public dynamic DeleteService(string id)
         {
             try
             {
-                var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == id).FirstOrDefault();
+                var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == Convert.ToInt32(id)).FirstOrDefault();
                 if (service == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
                 
@@ -39,19 +39,19 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-        public dynamic GetServices(int servicesId, Pagination pageInfo)
+        public dynamic GetServices(string servicesId, Pagination pageInfo)
         {
             try
             {
                 int totalCount = 0;
                 ServicesGetResponse response = new ServicesGetResponse();
                 List<ServicesModel> objServicesModelList = new List<ServicesModel>();
-                if (servicesId == 0)
+                if (servicesId == "0")
                 {
                     objServicesModelList = (from services in _context.Services
                                             select new ServicesModel()
                                             {
-                                                ServiceId = services.ServiceId,
+                                                ServiceId = services.ServiceId.ToString(),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
                                             }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
@@ -61,15 +61,15 @@ namespace InstitutionService.Repository
                 else
                 {
                     objServicesModelList = (from services in _context.Services
-                                            where services.ServiceId == servicesId
+                                            where services.ServiceId == Convert.ToInt32(servicesId)
                                             select new ServicesModel()
                                             {
-                                                ServiceId = services.ServiceId,
+                                                ServiceId = services.ServiceId.ToString(),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
                                             }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Services.Where(x => x.ServiceId == servicesId).ToList().Count();
+                    totalCount = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(servicesId)).ToList().Count();
                 }
                 if (objServicesModelList == null || objServicesModelList.Count == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
@@ -117,7 +117,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                var servicesData = _context.Services.Where(x => x.ServiceId == model.ServiceId).FirstOrDefault();
+                var servicesData = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(model.ServiceId)).FirstOrDefault();
                 if (servicesData == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
 

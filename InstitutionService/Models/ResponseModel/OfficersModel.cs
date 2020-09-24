@@ -2,8 +2,8 @@
 {
     public class OfficersModel
     {
-        public int OfficerId { get; set; }
-        public int? UserId { get; set; }
-        public int? InstitutionId { get; set; }
+        public string OfficerId { get; set; }
+        public string UserId { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

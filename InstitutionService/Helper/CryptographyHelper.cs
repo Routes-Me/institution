@@ -106,7 +106,7 @@ namespace InstitutionService.Helper
                         keySize = int.Parse(splittedValues[0]);
                         xmlKey = splittedValues[1];
                     }
-                    catch (Exception e) { }
+                    catch (Exception ex) { }
                 }
             }
         }

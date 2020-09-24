@@ -2,8 +2,8 @@
 {
     public class DriversModel
     {
-        public int DriverId { get; set; }
-        public int? UserId { get; set; }
-        public int? InstitutionId { get; set; }
+        public string DriverId { get; set; }
+        public string UserId { get; set; }
+        public string InstitutionId { get; set; }
     }
 }

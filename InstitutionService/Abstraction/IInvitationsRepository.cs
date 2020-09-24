@@ -6,8 +6,8 @@ namespace InstitutionService.Abstraction
 {
     public interface IInvitationsRepository
     {
-        Task<dynamic> InsertInvitation(int officerId, InvitationsModel model);
-        dynamic DeleteInvitation(int officerId, int id);
-        dynamic GetInvitation(int invitationId, Pagination pageInfo);
+        Task<dynamic> InsertInvitation(string officerId, InvitationsModel model);
+        dynamic DeleteInvitation(string officerId, string id);
+        dynamic GetInvitation(string invitationId, Pagination pageInfo);
     }
 }

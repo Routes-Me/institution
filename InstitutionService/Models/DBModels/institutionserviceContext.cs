@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace InstitutionService.Models.DBModels
 {
@@ -13,6 +15,7 @@ namespace InstitutionService.Models.DBModels
         {
         }
 
+        public virtual DbSet<Authorities> Authorities { get; set; }
         public virtual DbSet<Institutions> Institutions { get; set; }
         public virtual DbSet<Invitations> Invitations { get; set; }
         public virtual DbSet<Officers> Officers { get; set; }
@@ -21,6 +24,32 @@ namespace InstitutionService.Models.DBModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Authorities>(entity =>
+            {
+                entity.HasKey(e => e.AuthorityId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("authorities");
+
+                entity.HasIndex(e => e.InstitutionId)
+                    .HasName("institution_id");
+
+                entity.Property(e => e.AuthorityId).HasColumnName("authority_id");
+
+                entity.Property(e => e.InstitutionId).HasColumnName("institution_id");
+
+                entity.Property(e => e.Pin)
+                    .HasColumnName("pin")
+                    .HasColumnType("char(64)")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
+
+                entity.HasOne(d => d.Institution)
+                    .WithMany(p => p.Authorities)
+                    .HasForeignKey(d => d.InstitutionId)
+                    .HasConstraintName("authorities_ibfk_1");
+            });
+
             modelBuilder.Entity<Institutions>(entity =>
             {
                 entity.HasKey(e => e.InstitutionId)
@@ -46,11 +75,7 @@ namespace InstitutionService.Models.DBModels
                     .HasCharSet("utf8mb4")
                     .HasCollation("utf8mb4_0900_ai_ci");
 
-                entity.Property(e => e.PhoneNumber)
-                    .HasColumnName("phone_number")
-                    .HasColumnType("varchar(15)")
-                    .HasCharSet("utf8mb4")
-                    .HasCollation("utf8mb4_0900_ai_ci");
+                entity.Property(e => e.PhoneNumber).HasColumnName("phone_number");
             });
 
             modelBuilder.Entity<Invitations>(entity =>

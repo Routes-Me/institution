@@ -27,15 +27,15 @@ namespace InstitutionService.Repository
             _messageSender = messageSender;
         }
 
-        public dynamic DeleteInvitation(int officerId, int id)
+        public dynamic DeleteInvitation(string officerId, string id)
         {
             try
             {
-                var officer = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerId).FirstOrDefault();
+                var officer = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == Convert.ToInt32(officerId)).FirstOrDefault();
                 if (officer == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                var invitation = officer.Invitations.Where(x => x.InvitationId == id && x.OfficerId == officerId).FirstOrDefault();
+                var invitation = officer.Invitations.Where(x => x.InvitationId == Convert.ToInt32(id) && x.OfficerId == Convert.ToInt32(officerId)).FirstOrDefault();
                 if (invitation == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
 
@@ -49,25 +49,25 @@ namespace InstitutionService.Repository
             }
         }
 
-        public dynamic GetInvitation(int invitationId, Pagination pageInfo)
+        public dynamic GetInvitation(string invitationId, Pagination pageInfo)
         {
             InvitationsGetResponse response = new InvitationsGetResponse();
             int totalCount = 0;
             try
             {
                 List<InvitationsGetModel> objInvitationsModelList = new List<InvitationsGetModel>();
-                if (invitationId == 0)
+                if (invitationId == "0")
                 {
                     objInvitationsModelList = (from invitation in _context.Invitations
 
                                                select new InvitationsGetModel()
                                                {
-                                                   InvitationId = invitation.InvitationId,
+                                                   InvitationId = invitation.InvitationId.ToString(),
                                                    RecipientName = invitation.RecipientName,
                                                    Link = invitation.Link,
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
-                                                   OfficerId = invitation.OfficerId
+                                                   OfficerId = invitation.OfficerId.ToString()
                                                }).OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Invitations.ToList().Count();
@@ -75,18 +75,18 @@ namespace InstitutionService.Repository
                 else
                 {
                     objInvitationsModelList = (from invitation in _context.Invitations
-                                               where invitation.InvitationId == invitationId
+                                               where invitation.InvitationId == Convert.ToInt32(invitationId)
                                                select new InvitationsGetModel()
                                                {
-                                                   InvitationId = invitation.InvitationId,
+                                                   InvitationId = invitation.InvitationId.ToString(),
                                                    RecipientName = invitation.RecipientName,
                                                    Link = invitation.Link,
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
-                                                   OfficerId = invitation.OfficerId
+                                                   OfficerId = invitation.OfficerId.ToString()
                                                }).OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Invitations.Where(x => x.InvitationId == invitationId).ToList().Count();
+                    totalCount = _context.Invitations.Where(x => x.InvitationId == Convert.ToInt32(invitationId)).ToList().Count();
                 }
                 if (objInvitationsModelList == null || objInvitationsModelList.Count == 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
@@ -111,7 +111,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public async Task<dynamic> InsertInvitation(int OfficerId, InvitationsModel model)
+        public async Task<dynamic> InsertInvitation(string OfficerId, InvitationsModel model)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace InstitutionService.Repository
                 string Address = string.Empty, Hash = string.Empty;
                 bool IsEmail = false;
 
-                var officer = _context.Officers.Where(x => x.OfficerId == OfficerId).FirstOrDefault();
+                var officer = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(OfficerId)).FirstOrDefault();
                 if (officer == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
@@ -140,14 +140,14 @@ namespace InstitutionService.Repository
                     IsEmail = true;
                 }
 
-                var institution = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
+                var institution = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(model.InstitutionId)).FirstOrDefault();
                 if (institution == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
 
                 Data = Encoding.ASCII.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(model));
                 Invitations invitation = new Invitations()
                 {
-                    OfficerId = OfficerId,
+                    OfficerId = Convert.ToInt32(OfficerId),
                     Address = Address,
                     RecipientName = model.Name,
                     Data = Data

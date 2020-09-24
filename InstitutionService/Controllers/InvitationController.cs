@@ -18,7 +18,7 @@ namespace InstitutionService.Controllers
 
         [HttpPost]
         [Route("officers/{officerid=0}/invitations")]
-        public async Task<IActionResult> Post(int officerid, InvitationsModel model)
+        public async Task<IActionResult> Post(string officerid, InvitationsModel model)
         {
             dynamic response = await _invitionRepository.InsertInvitation(officerid, model);
             return StatusCode((int)response.statusCode, response);
@@ -26,7 +26,7 @@ namespace InstitutionService.Controllers
 
         [HttpDelete]
         [Route("officers/{officerid=0}/{invitations}/{id}")]
-        public IActionResult Delete(int officerid, int id)
+        public IActionResult Delete(string officerid, string id)
         {
             dynamic response = _invitionRepository.DeleteInvitation(officerid, id);
             return StatusCode((int)response.statusCode, response);
@@ -34,7 +34,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("invitations/{invitationId=0}")]
-        public IActionResult Get(int invitationId, [FromQuery] Pagination pageInfo)
+        public IActionResult Get(string invitationId, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _invitionRepository.GetInvitation(invitationId, pageInfo);
             return StatusCode((int)response.statusCode, response);

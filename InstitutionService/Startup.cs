@@ -51,6 +51,9 @@ namespace InstitutionService
             services.AddSingleton<IMessageSender>(new MessageSender(
                 Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
 
+            var dependenciessSection = Configuration.GetSection("Dependencies");
+            services.Configure<Dependencies>(dependenciessSection);
+
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
             var appSettings = appSettingsSection.Get<AppSettings>();

@@ -22,11 +22,11 @@ namespace InstitutionService.Repository
             _officersIncludedRepository = officersIncludedRepository;
         }
 
-        public dynamic DeleteOfficers(int officerId)
+        public dynamic DeleteOfficers(string officerId)
         {
             try
             {
-                var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerId).FirstOrDefault();
+                var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == Convert.ToInt32(officerId)).FirstOrDefault();
                 if (officers == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
@@ -45,21 +45,21 @@ namespace InstitutionService.Repository
             }
         }
 
-        public dynamic GetOfficers(int officerId, string includeType, Pagination pageInfo)
+        public dynamic GetOfficers(string officerId, string includeType, Pagination pageInfo)
         {
             try
             {
                 int totalCount = 0;
                 OfficersGetResponse response = new OfficersGetResponse();
                 List<OfficersModel> objOfficersModelList = new List<OfficersModel>();
-                if (officerId == 0)
+                if (officerId == "0")
                 {
                     objOfficersModelList = (from officer in _context.Officers
                                             select new OfficersModel()
                                             {
-                                                OfficerId = officer.OfficerId,
-                                                InstitutionId = officer.InstitutionId,
-                                                UserId = officer.UserId
+                                                OfficerId = officer.OfficerId.ToString(),
+                                                InstitutionId = officer.InstitutionId.ToString(),
+                                                UserId = officer.UserId.ToString()
                                             }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Officers.ToList().Count();
@@ -67,15 +67,15 @@ namespace InstitutionService.Repository
                 else
                 {
                     objOfficersModelList = (from officer in _context.Officers
-                                            where officer.OfficerId == officerId
+                                            where officer.OfficerId == Convert.ToInt32(officerId)
                                             select new OfficersModel()
                                             {
-                                                OfficerId = officer.OfficerId,
-                                                InstitutionId = officer.InstitutionId,
-                                                UserId = officer.UserId
+                                                OfficerId = officer.OfficerId.ToString(),
+                                                InstitutionId = officer.InstitutionId.ToString(),
+                                                UserId = officer.UserId.ToString()
                                             }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Officers.Where(x => x.OfficerId == officerId).ToList().Count();
+                    totalCount = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
                 }
 
                 if (objOfficersModelList == null || objOfficersModelList.Count == 0)
@@ -132,14 +132,14 @@ namespace InstitutionService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(model.InstitutionId)).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 Officers objOfficers = new Officers()
                 {
-                    UserId = model.UserId,
-                    InstitutionId = model.InstitutionId
+                    UserId = Convert.ToInt32(model.UserId),
+                    InstitutionId = Convert.ToInt32(model.InstitutionId)
                 };
                 _context.Officers.Add(objOfficers);
                 _context.SaveChanges();
@@ -158,16 +158,16 @@ namespace InstitutionService.Repository
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var officers = _context.Officers.Include(x => x.Institution).Where(x => x.OfficerId == model.OfficerId).FirstOrDefault();
+                var officers = _context.Officers.Include(x => x.Institution).Where(x => x.OfficerId == Convert.ToInt32(model.OfficerId)).FirstOrDefault();
                 if (officers == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == model.InstitutionId).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(model.InstitutionId)).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                officers.InstitutionId = model.InstitutionId;
-                officers.UserId = model.UserId;
+                officers.InstitutionId = Convert.ToInt32(model.InstitutionId);
+                officers.UserId = Convert.ToInt32(model.UserId);
                 _context.Officers.Update(officers);
                 _context.SaveChanges();
                 return ReturnResponse.SuccessResponse(CommonMessage.OfficerUpdate, false);

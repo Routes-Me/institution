@@ -4,6 +4,7 @@ using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +22,7 @@ namespace InstitutionService.Helper.Repository
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objInstitutionsModelList)
             {
-                var servicesInstitutionDetails = _context.ServicesInstitutions.Where(x => x.InstitutionId == item.InstitutionId).ToList();
+                var servicesInstitutionDetails = _context.ServicesInstitutions.Where(x => x.InstitutionId == Convert.ToInt32(item.InstitutionId)).ToList();
                 if (servicesInstitutionDetails != null && servicesInstitutionDetails.Count > 0)
                 {
                     foreach (var serviceDetails in servicesInstitutionDetails)
@@ -33,7 +34,7 @@ namespace InstitutionService.Helper.Repository
                             {
                                 lstServices.Add(new ServicesModel
                                 {
-                                    ServiceId = serviceData.ServiceId,
+                                    ServiceId = serviceData.ServiceId.ToString(),
                                     Name = serviceData.Name,
                                     Description = serviceData.Descriptions,
                                 });
