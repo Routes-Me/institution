@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,11 +18,13 @@ namespace InstitutionService.Helper.Repository
     public class OfficersIncludedRepository : IOfficersIncludedRepository
     {
         private readonly institutionserviceContext _context;
-        private readonly IOptions<AppSettings> _appSettings;
-        public OfficersIncludedRepository(institutionserviceContext context, IOptions<AppSettings> appSettings)
+        private readonly AppSettings _appSettings;
+        private readonly Dependencies _dependencies;
+        public OfficersIncludedRepository(institutionserviceContext context, IOptions<AppSettings> appSettings, IOptions<Dependencies> dependencies)
         {
             _context = context;
-            _appSettings = appSettings;
+            _appSettings = appSettings.Value;
+            _dependencies = dependencies.Value;
 
         }
         public dynamic GetInstitutionsIncludedData(List<OfficersModel> objOfficersModelList)
@@ -29,15 +32,15 @@ namespace InstitutionService.Helper.Repository
             List<GetInstitutionsModel> lstInstitutions = new List<GetInstitutionsModel>();
             foreach (var item in objOfficersModelList)
             {
-                var institutionDetails = _context.Institutions.Where(x => x.InstitutionId == item.InstitutionId).FirstOrDefault();
+                var institutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(item.InstitutionId)).FirstOrDefault();
                 if (institutionDetails != null)
                 {
                     lstInstitutions.Add(new GetInstitutionsModel
                     {
-                        InstitutionId = institutionDetails.InstitutionId,
+                        InstitutionId = institutionDetails.InstitutionId.ToString(),
                         Name = institutionDetails.Name,
                         CreatedAt = institutionDetails.CreatedAt,
-                        PhoneNumber = institutionDetails.PhoneNumber,
+                        PhoneNumber = Convert.ToInt32(institutionDetails.PhoneNumber),
                         CountryIso = institutionDetails.CountryIso
                     });
                 }
@@ -51,7 +54,7 @@ namespace InstitutionService.Helper.Repository
             List<UserModel> lstUsers = new List<UserModel>();
             foreach (var item in objOfficersModelList)
             {
-                var client = new RestClient(_appSettings.Value.UserEndpointUrl + item.UserId);
+                var client = new RestClient(_appSettings.Host + _dependencies.UserUrl + item.UserId);
                 var request = new RestRequest(Method.GET);
                 IRestResponse response = client.Execute(request);
                 if (response.StatusCode == HttpStatusCode.OK)

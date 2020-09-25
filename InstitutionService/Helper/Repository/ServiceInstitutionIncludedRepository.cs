@@ -2,8 +2,7 @@
 using InstitutionService.Helper.Functions;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,15 +20,15 @@ namespace InstitutionService.Helper.Repository
             List<GetInstitutionsModel> lstInstitutions = new List<GetInstitutionsModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var institutionsDetails = _context.Institutions.Where(x => x.InstitutionId == item.InstitutionId).FirstOrDefault();
+                var institutionsDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(item.InstitutionId)).FirstOrDefault();
                 if (institutionsDetails != null)
                 {
                     lstInstitutions.Add(new GetInstitutionsModel
                     {
-                        InstitutionId = institutionsDetails.InstitutionId,
+                        InstitutionId = institutionsDetails.InstitutionId.ToString(),
                         Name = institutionsDetails.Name,
                         CreatedAt = institutionsDetails.CreatedAt,
-                        PhoneNumber = institutionsDetails.PhoneNumber,
+                        PhoneNumber = Convert.ToInt32(institutionsDetails.PhoneNumber),
                         CountryIso = institutionsDetails.CountryIso
                     });
                 }
@@ -43,12 +42,12 @@ namespace InstitutionService.Helper.Repository
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var servicesDetails = _context.Services.Where(x => x.ServiceId == item.ServiceId).FirstOrDefault();
+                var servicesDetails = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(item.ServiceId)).FirstOrDefault();
                 if (servicesDetails != null)
                 {
                     lstServices.Add(new ServicesModel
                     {
-                        ServiceId = servicesDetails.ServiceId,
+                        ServiceId = servicesDetails.ServiceId.ToString(),
                         Name = servicesDetails.Name,
                         Description = servicesDetails.Descriptions,
                     });

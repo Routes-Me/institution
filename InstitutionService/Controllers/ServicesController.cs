@@ -33,7 +33,7 @@ namespace InstitutionService.Controllers
 
         [HttpDelete]
         [Route("services/{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string id)
         {
             dynamic response = _serviceRepository.DeleteService(id);
             return StatusCode((int)response.statusCode, response);
@@ -41,7 +41,7 @@ namespace InstitutionService.Controllers
 
         [HttpGet]   
         [Route("services/{servicesId=0}")]
-        public IActionResult Get(int servicesId, [FromQuery] Pagination pageInfo)
+        public IActionResult Get(string servicesId, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _serviceRepository.GetServices(servicesId, pageInfo);
             return StatusCode((int)response.statusCode, response);

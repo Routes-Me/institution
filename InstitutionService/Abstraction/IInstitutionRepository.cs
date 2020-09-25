@@ -7,7 +7,7 @@ namespace InstitutionService.Abstraction
     {
         dynamic InsertInstitutions(InstitutionsModel institutionModel);
         dynamic UpdateInstitution(InstitutionsModel institutionModel);
-        dynamic DeleteInstitution(int id);
-        dynamic GetInstitutions(int institutionId, string include, Pagination pageInfo);
+        dynamic DeleteInstitution(string id);
+        dynamic GetInstitutions(string institutionId, string include, Pagination pageInfo);
     }
 }

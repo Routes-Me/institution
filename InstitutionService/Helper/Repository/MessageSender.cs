@@ -18,7 +18,7 @@ namespace InstitutionService.Helper.Repository
 
         public async Task<MessageResource> SendMessage(string to, string body)
         {
-            return await MessageResource.CreateAsync(new PhoneNumber("+91" + to),
+            return await MessageResource.CreateAsync(new PhoneNumber("+965" + to),
                                               from: new PhoneNumber("+19418002903"),
                                               body: body);
         }

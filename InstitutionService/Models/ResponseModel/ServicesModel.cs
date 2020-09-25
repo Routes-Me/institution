@@ -2,7 +2,7 @@
 {
     public class ServicesModel
     {
-        public int ServiceId { get; set; }
+        public string ServiceId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

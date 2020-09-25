@@ -22,15 +22,15 @@ namespace InstitutionService.Repository
             _serviceInstitutionIncludedRepository = serviceInstitutionIncludedRepository;
         }
 
-        public dynamic DeleteServicesInstitutions(int institutionId, int serviceId)
+        public dynamic DeleteServicesInstitutions(string institutionId, string serviceId)
         {
             try
             {
-                var institution = _context.Institutions.Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == institutionId).FirstOrDefault();
+                var institution = _context.Institutions.Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).FirstOrDefault();
                 if (institution == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                var servicesinstitutions = institution.ServicesInstitutions.Where(x => x.ServiceId == serviceId).FirstOrDefault();
+                var servicesinstitutions = institution.ServicesInstitutions.Where(x => x.ServiceId == Convert.ToInt32(serviceId)).FirstOrDefault();
                 if (servicesinstitutions == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceInstitutionNotFound, StatusCodes.Status404NotFound);
 
@@ -43,40 +43,40 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-        public dynamic GetServicesInstitutions(int institutionId, int serviceId, string includeType, Pagination pageInfo)
+        public dynamic GetServicesInstitutions(string institutionId, string serviceId, string includeType, Pagination pageInfo)
         {
             try
             {
                 int totalCount = 0;
                 ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 List<ServicesInstitutionsModel> objServicesInstitutionsModel = new List<ServicesInstitutionsModel>();
-                if (serviceId == 0)
+                if (Convert.ToInt32(serviceId) == 0)
                 {
                     objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
-                                                    where servicesinstitution.InstitutionId == institutionId
+                                                    where servicesinstitution.InstitutionId == Convert.ToInt32(institutionId)
                                                     select new ServicesInstitutionsModel()
                                                     {
-                                                        InstitutionId = servicesinstitution.InstitutionId,
-                                                        ServiceId = servicesinstitution.ServiceId
+                                                        InstitutionId = servicesinstitution.InstitutionId.ToString(),
+                                                        ServiceId = servicesinstitution.ServiceId.ToString()
                                                     }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).ToList().Count();
                 }
                 else
                 {
                     objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
-                                                    where servicesinstitution.InstitutionId == institutionId && servicesinstitution.ServiceId == serviceId
+                                                    where servicesinstitution.InstitutionId == Convert.ToInt32(institutionId) && servicesinstitution.ServiceId == Convert.ToInt32(serviceId)
                                                     select new ServicesInstitutionsModel()
                                                     {
-                                                        InstitutionId = servicesinstitution.InstitutionId,
-                                                        ServiceId = servicesinstitution.ServiceId
+                                                        InstitutionId = servicesinstitution.InstitutionId.ToString(),
+                                                        ServiceId = servicesinstitution.ServiceId.ToString()
                                                     }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionId && x.ServiceId == serviceId).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId) && x.ServiceId == Convert.ToInt32(serviceId)).ToList().Count();
                 }
 
                 if (objServicesInstitutionsModel == null || objServicesInstitutionsModel.Count == 0)
@@ -125,21 +125,21 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-        public dynamic InsertServicesInstitutions(int institutionsId, ServicesInstitutionsPostModel model)
+        public dynamic InsertServicesInstitutions(string institutionsId, ServicesInstitutionsPostModel model)
         {
             try
             {
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionsId).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionsId)).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                if (model == null || model.ServiceId <= 0)
+                if (model == null || Convert.ToInt32(model.ServiceId) <= 0)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
                 ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
                 {
-                    InstitutionId = institutionsId,
-                    ServiceId = model.ServiceId
+                    InstitutionId = Convert.ToInt32(institutionsId),
+                    ServiceId = Convert.ToInt32(model.ServiceId)
                 };
                 _context.ServicesInstitutions.Add(objServicesinstitutions);
                 _context.SaveChanges();

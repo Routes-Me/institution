@@ -7,8 +7,8 @@ namespace InstitutionService.Abstraction
     {
         dynamic InsertOfficers(OfficersModel Model);
         dynamic UpdateOfficers(OfficersModel Model);
-        dynamic DeleteOfficers(int officerId);
-        dynamic GetOfficers(int officersId,string include, Pagination pageInfo); 
+        dynamic DeleteOfficers(string officerId);
+        dynamic GetOfficers(string officersId,string include, Pagination pageInfo); 
     }
 }
     
