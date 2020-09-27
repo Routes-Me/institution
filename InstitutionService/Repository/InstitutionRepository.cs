@@ -28,7 +28,7 @@ namespace InstitutionService.Repository
             {
                 if (Model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
-                
+
                 Institutions objInstitutions = new Institutions()
                 {
                     Name = Model.Name,
@@ -133,11 +133,19 @@ namespace InstitutionService.Repository
                                                     InstitutionId = institution.InstitutionId.ToString(),
                                                     Name = institution.Name,
                                                     CreatedAt = institution.CreatedAt,
-                                                    PhoneNumber = Convert.ToInt32(institution.PhoneNumber),
+                                                    PhoneNumber = institution.PhoneNumber,
                                                     CountryIso = institution.CountryIso,
                                                 }).OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Institutions.ToList().Count();
+                    totalCount = (from institution in _context.Institutions
+                                  select new GetInstitutionsModel()
+                                  {
+                                      InstitutionId = institution.InstitutionId.ToString(),
+                                      Name = institution.Name,
+                                      CreatedAt = institution.CreatedAt,
+                                      PhoneNumber = institution.PhoneNumber,
+                                      CountryIso = institution.CountryIso,
+                                  }).ToList().Count();
                 }
                 else
                 {
@@ -148,7 +156,7 @@ namespace InstitutionService.Repository
                                                     InstitutionId = institution.InstitutionId.ToString(),
                                                     Name = institution.Name,
                                                     CreatedAt = institution.CreatedAt,
-                                                    PhoneNumber = Convert.ToInt32(institution.PhoneNumber),
+                                                    PhoneNumber = institution.PhoneNumber,
                                                     CountryIso = institution.CountryIso,
                                                 }).OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 

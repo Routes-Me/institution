@@ -40,7 +40,7 @@ namespace InstitutionService.Helper.Repository
                         InstitutionId = institutionDetails.InstitutionId.ToString(),
                         Name = institutionDetails.Name,
                         CreatedAt = institutionDetails.CreatedAt,
-                        PhoneNumber = Convert.ToInt32(institutionDetails.PhoneNumber),
+                        PhoneNumber = institutionDetails.PhoneNumber,
                         CountryIso = institutionDetails.CountryIso
                     });
                 }

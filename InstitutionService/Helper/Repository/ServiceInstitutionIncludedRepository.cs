@@ -28,7 +28,7 @@ namespace InstitutionService.Helper.Repository
                         InstitutionId = institutionsDetails.InstitutionId.ToString(),
                         Name = institutionsDetails.Name,
                         CreatedAt = institutionsDetails.CreatedAt,
-                        PhoneNumber = Convert.ToInt32(institutionsDetails.PhoneNumber),
+                        PhoneNumber = institutionsDetails.PhoneNumber,
                         CountryIso = institutionsDetails.CountryIso
                     });
                 }
