@@ -41,7 +41,7 @@ namespace InstitutionService.Models
         public static dynamic ErrorResponse(string message, int statusCode)
         {
             Response response = new Response();
-            response.status = true;
+            response.status = false;
             response.message = message;
             response.statusCode = statusCode;
             return response;
