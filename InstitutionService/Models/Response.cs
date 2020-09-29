@@ -21,8 +21,8 @@ namespace InstitutionService.Models
         {
             Response response = new Response();
             response.status = false;
-            response.message = "Something went wrong. Error Message - " + ex.Message;
-            response.statusCode = StatusCodes.Status500InternalServerError;
+            response.message = CommonMessage.GenericException;
+            response.statusCode = StatusCodes.Status401Unauthorized;
             return response;
         }
 

@@ -38,5 +38,7 @@ namespace InstitutionService.Models
         public static string ServiceInstitutionRetrived = "Service institutions retrived successfully.";
         public static string ServiceInstitutionNotFound = "Services institutions not found.";
 
+        public static string GenericException = "You are not authorized to access this content.";
+
     }
 }
