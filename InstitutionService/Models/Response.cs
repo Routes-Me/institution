@@ -60,8 +60,6 @@ namespace InstitutionService.Models
     #endregion
 
     #region Services Response
-
-
     public class ServicesGetResponse : Response
     {
         public Pagination pagination { get; set; }
@@ -70,7 +68,6 @@ namespace InstitutionService.Models
     #endregion
 
     #region Officers Response
-
     public class OfficersGetResponse : Response
     {
         public Pagination pagination { get; set; }
@@ -84,7 +81,6 @@ namespace InstitutionService.Models
         public Pagination pagination { get; set; }
         public List<UserModel> data { get; set; }
     }
-
     #endregion
 
     #region ServicesInstitutions Response
@@ -97,17 +93,21 @@ namespace InstitutionService.Models
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject included { get; set; }
     }
-
     #endregion
 
     #region Invitations Response
-
     public class InvitationsGetResponse : Response
     {
         public Pagination pagination { get; set; }
         public List<InvitationsGetModel> data { get; set; }
     }
+    #endregion
 
- 
+    #region Authorities Reponse
+    public class AuthoritiesGetResponse : Response
+    {
+        public Pagination pagination { get; set; }
+        public List<AuthoritiesModel> data { get; set; }
+    }
     #endregion
 }

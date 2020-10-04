@@ -38,6 +38,11 @@ namespace InstitutionService.Models
         public static string ServiceInstitutionRetrived = "Service institutions retrived successfully.";
         public static string ServiceInstitutionNotFound = "Services institutions not found.";
 
+        public static string AuthoritiesInsert = "Authorities inserted successfully.";
+        public static string AuthoritiesDelete = "Authorities deleted successfully.";
+        public static string AuthoritiesUpdate = "Authorities updated successfully.";
+        public static string AuthoritiesRetrived = "Authorities retrived successfully.";
+        public static string AuthoritiesNotFound = "Authorities not found.";
         public static string GenericException = "You are not authorized to access this content.";
 
     }
