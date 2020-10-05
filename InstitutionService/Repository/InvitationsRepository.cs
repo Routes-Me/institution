@@ -88,8 +88,6 @@ namespace InstitutionService.Repository
 
                     totalCount = _context.Invitations.Where(x => x.InvitationId == Convert.ToInt32(invitationId)).ToList().Count();
                 }
-                if (objInvitationsModelList == null || objInvitationsModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.InvitationNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {

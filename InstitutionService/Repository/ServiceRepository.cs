@@ -71,9 +71,7 @@ namespace InstitutionService.Repository
 
                     totalCount = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(servicesId)).ToList().Count();
                 }
-                if (objServicesModelList == null || objServicesModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
-                
+               
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,

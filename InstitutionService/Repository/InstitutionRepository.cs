@@ -162,8 +162,6 @@ namespace InstitutionService.Repository
 
                     totalCount = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).ToList().Count();
                 }
-                if (objInstitutionsModelList == null || objInstitutionsModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 var page = new Pagination
                 {

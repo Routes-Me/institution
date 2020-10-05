@@ -78,9 +78,6 @@ namespace InstitutionService.Repository
                     totalCount = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
                 }
 
-                if (objOfficersModelList == null || objOfficersModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
-
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,

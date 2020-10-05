@@ -111,9 +111,6 @@ namespace InstitutionService.Repository
 
                 totalCount = _context.Authorities.Where(x => x.AuthorityId == Convert.ToInt32(id)).ToList().Count();
 
-                if (authoritiesModelList == null || authoritiesModelList.Count == 0)
-                    return ReturnResponse.ErrorResponse(CommonMessage.AuthoritiesNotFound, StatusCodes.Status404NotFound);
-
                 var page = new Pagination
                 {
                     offset = pageInfo.offset,
