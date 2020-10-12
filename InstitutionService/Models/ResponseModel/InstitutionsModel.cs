@@ -10,7 +10,7 @@ namespace InstitutionService.Models.ResponseModel
         public DateTime? CreatedAt { get; set; }
         public string PhoneNumber { get; set; }
         public string CountryIso { get; set; }
-        public List<int> services { get; set; }
+        public List<string> services { get; set; }
     }
 
     public class GetInstitutionsModel

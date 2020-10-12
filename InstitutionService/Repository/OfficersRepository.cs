@@ -9,6 +9,9 @@ using Newtonsoft.Json.Linq;
 using InstitutionService.Helper.Abstraction;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using InstitutionService.Helper.Models;
+using Microsoft.Extensions.Options;
+using Obfuscation;
 
 namespace InstitutionService.Repository
 {
@@ -16,8 +19,11 @@ namespace InstitutionService.Repository
     {
         private readonly institutionserviceContext _context;
         private readonly IOfficersIncludedRepository _officersIncludedRepository;
-        public OfficersRepository(institutionserviceContext context, IOfficersIncludedRepository officersIncludedRepository)
+        private readonly AppSettings _appSettings;
+
+        public OfficersRepository(IOptions<AppSettings> appSettings, institutionserviceContext context, IOfficersIncludedRepository officersIncludedRepository)
         {
+            _appSettings = appSettings.Value;
             _context = context;
             _officersIncludedRepository = officersIncludedRepository;
         }
@@ -26,11 +32,12 @@ namespace InstitutionService.Repository
         {
             try
             {
-                var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == Convert.ToInt32(officerId)).FirstOrDefault();
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
+                var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerIdDecrypted).FirstOrDefault();
                 if (officers == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                if(officers.Invitations != null)
+                if (officers.Invitations != null)
                 {
                     _context.Invitations.RemoveRange(officers.Invitations);
                     _context.SaveChanges();
@@ -45,37 +52,84 @@ namespace InstitutionService.Repository
             }
         }
 
-        public dynamic GetOfficers(string officerId, string includeType, Pagination pageInfo)
+        public dynamic GetOfficers(string officerId, string userId, string includeType, Pagination pageInfo)
         {
             try
             {
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
+                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(userId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 OfficersGetResponse response = new OfficersGetResponse();
                 List<OfficersModel> objOfficersModelList = new List<OfficersModel>();
-                if (officerId == "0")
+                if (Convert.ToInt32(officerIdDecrypted) == 0)
                 {
-                    objOfficersModelList = (from officer in _context.Officers
-                                            select new OfficersModel()
-                                            {
-                                                OfficerId = officer.OfficerId.ToString(),
-                                                InstitutionId = officer.InstitutionId.ToString(),
-                                                UserId = officer.UserId.ToString()
-                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (Convert.ToInt32(userIdDecrypted) == 0)
+                    {
+                        objOfficersModelList = (from officer in _context.Officers
+                                                select new OfficersModel()
+                                                {
+                                                    OfficerId = officer.OfficerId.ToString(),
+                                                    InstitutionId = officer.InstitutionId.ToString(),
+                                                    UserId = officer.UserId.ToString(),
+                                                }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Officers.ToList().Count();
+                        totalCount = _context.Officers.ToList().Count();
+                    }
+                    else
+                    {
+                        objOfficersModelList = (from officer in _context.Officers
+                                                where officer.UserId == Convert.ToInt32(userIdDecrypted)
+                                                select new OfficersModel()
+                                                {
+                                                    OfficerId = officer.OfficerId.ToString(),
+                                                    InstitutionId = officer.InstitutionId.ToString(),
+                                                    UserId = officer.UserId.ToString(),
+                                                }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Officers.Where(x => x.UserId == Convert.ToInt32(userIdDecrypted)).ToList().Count();
+                    }
                 }
                 else
                 {
-                    objOfficersModelList = (from officer in _context.Officers
-                                            where officer.OfficerId == Convert.ToInt32(officerId)
-                                            select new OfficersModel()
-                                            {
-                                                OfficerId = officer.OfficerId.ToString(),
-                                                InstitutionId = officer.InstitutionId.ToString(),
-                                                UserId = officer.UserId.ToString()
-                                            }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                    if (Convert.ToInt32(userIdDecrypted) == 0)
+                    {
+                        objOfficersModelList = (from officer in _context.Officers
+                                                where officer.OfficerId == Convert.ToInt32(officerIdDecrypted)
+                                                select new OfficersModel()
+                                                {
+                                                    OfficerId = officer.OfficerId.ToString(),
+                                                    InstitutionId = officer.InstitutionId.ToString(),
+                                                    UserId = officer.UserId.ToString(),
+                                                }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(officerId)).ToList().Count();
+                        totalCount = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(officerIdDecrypted)).ToList().Count();
+                    }
+                    else
+                    {
+                        objOfficersModelList = (from officer in _context.Officers
+                                                where officer.OfficerId == Convert.ToInt32(officerIdDecrypted)
+                                                && officer.UserId == Convert.ToInt32(userIdDecrypted)
+                                                select new OfficersModel()
+                                                {
+                                                    OfficerId = officer.OfficerId.ToString(),
+                                                    InstitutionId = officer.InstitutionId.ToString(),
+                                                    UserId = officer.UserId.ToString(),
+                                                }).OrderBy(a => a.OfficerId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                        totalCount = _context.Officers.Where(x => x.OfficerId == Convert.ToInt32(officerIdDecrypted) && x.UserId == Convert.ToInt32(userIdDecrypted)).ToList().Count();
+                    }
+                }
+                List<OfficersModel> objOfficersModelListNew = new List<OfficersModel>();
+                if (objOfficersModelList.Count > 0)
+                {
+                    foreach (var item in objOfficersModelList)
+                    {
+                        OfficersModel obj = new OfficersModel();
+                        obj.OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(item.OfficerId), _appSettings.Prime).ToString();
+                        obj.InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(item.InstitutionId), _appSettings.Prime).ToString();
+                        obj.UserId = ObfuscationClass.EncodeId(Convert.ToInt32(item.UserId), _appSettings.Prime).ToString();
+                        objOfficersModelListNew.Add(obj);
+                    }
                 }
 
                 var page = new Pagination
@@ -95,11 +149,11 @@ namespace InstitutionService.Repository
                         {
                             if (item.ToLower() == "user" || item.ToLower() == "users")
                             {
-                                includeData.users = _officersIncludedRepository.GetUsersIncludedData(objOfficersModelList);
+                                includeData.users = _officersIncludedRepository.GetUsersIncludedData(objOfficersModelListNew);
                             }
                             else if (item.ToLower() == "institution" || item.ToLower() == "institutions")
                             {
-                                includeData.institutions = _officersIncludedRepository.GetInstitutionsIncludedData(objOfficersModelList);
+                                includeData.institutions = _officersIncludedRepository.GetInstitutionsIncludedData(objOfficersModelListNew);
                             }
                         }
                     }
@@ -111,7 +165,7 @@ namespace InstitutionService.Repository
                 response.status = true;
                 response.message = CommonMessage.OfficerRetrived;
                 response.pagination = page;
-                response.data = objOfficersModelList;
+                response.data = objOfficersModelListNew;
                 response.included = includeData;
                 response.statusCode = StatusCodes.Status200OK;
                 return response;
@@ -126,17 +180,19 @@ namespace InstitutionService.Repository
         {
             try
             {
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.UserId), _appSettings.PrimeInverse);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(model.InstitutionId)).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 Officers objOfficers = new Officers()
                 {
-                    UserId = Convert.ToInt32(model.UserId),
-                    InstitutionId = Convert.ToInt32(model.InstitutionId)
+                    UserId = userIdDecrypted,
+                    InstitutionId = institutionIdDecrypted
                 };
                 _context.Officers.Add(objOfficers);
                 _context.SaveChanges();
@@ -152,19 +208,22 @@ namespace InstitutionService.Repository
         {
             try
             {
+                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.OfficerId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.UserId), _appSettings.PrimeInverse);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
-                var officers = _context.Officers.Include(x => x.Institution).Where(x => x.OfficerId == Convert.ToInt32(model.OfficerId)).FirstOrDefault();
+                var officers = _context.Officers.Include(x => x.Institution).Where(x => x.OfficerId == officerIdDecrypted).FirstOrDefault();
                 if (officers == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
 
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(model.InstitutionId)).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                officers.InstitutionId = Convert.ToInt32(model.InstitutionId);
-                officers.UserId = Convert.ToInt32(model.UserId);
+                officers.InstitutionId = institutionIdDecrypted;
+                officers.UserId = userIdDecrypted;
                 _context.Officers.Update(officers);
                 _context.SaveChanges();
                 return ReturnResponse.SuccessResponse(CommonMessage.OfficerUpdate, false);

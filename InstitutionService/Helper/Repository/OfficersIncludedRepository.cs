@@ -7,6 +7,7 @@ using InstitutionService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Obfuscation;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -32,12 +33,13 @@ namespace InstitutionService.Helper.Repository
             List<GetInstitutionsModel> lstInstitutions = new List<GetInstitutionsModel>();
             foreach (var item in objOfficersModelList)
             {
-                var institutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(item.InstitutionId)).FirstOrDefault();
+                var institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var institutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (institutionDetails != null)
                 {
                     lstInstitutions.Add(new GetInstitutionsModel
                     {
-                        InstitutionId = institutionDetails.InstitutionId.ToString(),
+                        InstitutionId = ObfuscationClass.EncodeId(institutionDetails.InstitutionId, _appSettings.Prime).ToString(),
                         Name = institutionDetails.Name,
                         CreatedAt = institutionDetails.CreatedAt,
                         PhoneNumber = institutionDetails.PhoneNumber,

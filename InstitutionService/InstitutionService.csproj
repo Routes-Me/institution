@@ -26,5 +26,15 @@
     <PackageReference Include="Twilio" Version="5.45.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DLL\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Obfuscation">
+      <HintPath>DLL\Obfuscation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 
 </Project>

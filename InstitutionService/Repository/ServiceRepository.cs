@@ -1,9 +1,12 @@
 ﻿using InstitutionService.Abstraction;
+using InstitutionService.Helper.Models;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +16,19 @@ namespace InstitutionService.Repository
     public class ServiceRepository : IServiceRepository
     {
         private readonly institutionserviceContext _context;
-        public ServiceRepository(institutionserviceContext context)
+        private readonly AppSettings _appSettings;
+
+        public ServiceRepository(IOptions<AppSettings> appSettings, institutionserviceContext context)
         {
+            _appSettings = appSettings.Value;
             _context = context;
         }
         public dynamic DeleteService(string id)
         {
             try
             {
-                var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == Convert.ToInt32(id)).FirstOrDefault();
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (service == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
                 
@@ -43,33 +50,34 @@ namespace InstitutionService.Repository
         {
             try
             {
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(servicesId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 ServicesGetResponse response = new ServicesGetResponse();
                 List<ServicesModel> objServicesModelList = new List<ServicesModel>();
-                if (servicesId == "0")
+                if (serviceIdDecrypted == 0)
                 {
                     objServicesModelList = (from services in _context.Services
                                             select new ServicesModel()
                                             {
-                                                ServiceId = services.ServiceId.ToString(),
+                                                ServiceId = ObfuscationClass.EncodeId(services.ServiceId, _appSettings.Prime).ToString(),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
-                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                            }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Services.ToList().Count();
                 }
                 else
                 {
                     objServicesModelList = (from services in _context.Services
-                                            where services.ServiceId == Convert.ToInt32(servicesId)
+                                            where services.ServiceId == serviceIdDecrypted
                                             select new ServicesModel()
                                             {
-                                                ServiceId = services.ServiceId.ToString(),
+                                                ServiceId = ObfuscationClass.EncodeId(services.ServiceId, _appSettings.Prime).ToString(),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
-                                            }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                            }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(servicesId)).ToList().Count();
+                    totalCount = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).ToList().Count();
                 }
                
                 var page = new Pagination
@@ -115,7 +123,8 @@ namespace InstitutionService.Repository
         {
             try
             {
-                var servicesData = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(model.ServiceId)).FirstOrDefault();
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.ServiceId), _appSettings.PrimeInverse);
+                var servicesData = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (servicesData == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
 

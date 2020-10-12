@@ -33,7 +33,7 @@ namespace InstitutionService.Controllers
 
         [HttpDelete]
         [Route("officers/{officersId}")]
-        public IActionResult Delete(string officersId) 
+        public IActionResult Delete(string officersId)
         {
             dynamic response = _officersRepository.DeleteOfficers(officersId);
             return StatusCode((int)response.statusCode, response);
@@ -41,10 +41,12 @@ namespace InstitutionService.Controllers
 
         [HttpGet]
         [Route("officers/{officersId=0}")]
-        public IActionResult Get(string officersId,string include, [FromQuery] Pagination pageInfo)
+        public IActionResult Get(string officersId, string userId, string include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _officersRepository.GetOfficers(officersId, include, pageInfo);
+            dynamic response = _officersRepository.GetOfficers(officersId, userId, include, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
+
+
     }
 }

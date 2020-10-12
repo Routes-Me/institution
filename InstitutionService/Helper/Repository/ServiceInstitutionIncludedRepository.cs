@@ -1,7 +1,10 @@
 ﻿using InstitutionService.Helper.Abstraction;
 using InstitutionService.Helper.Functions;
+using InstitutionService.Helper.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
+using Microsoft.Extensions.Options;
+using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +14,11 @@ namespace InstitutionService.Helper.Repository
     public class ServiceInstitutionIncludedRepository : IServiceInstitutionIncludedRepository
     {
         private readonly institutionserviceContext _context;
-        public ServiceInstitutionIncludedRepository(institutionserviceContext context)
+        private readonly AppSettings _appSettings;
+
+        public ServiceInstitutionIncludedRepository(IOptions<AppSettings> appSettings, institutionserviceContext context)
         {
+            _appSettings = appSettings.Value;
             _context = context;
         }
         public dynamic GetInstitutionsIncludedData(List<ServicesInstitutionsModel> objServicesInstitutionsModel)
@@ -20,12 +26,13 @@ namespace InstitutionService.Helper.Repository
             List<GetInstitutionsModel> lstInstitutions = new List<GetInstitutionsModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var institutionsDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(item.InstitutionId)).FirstOrDefault();
+                var institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var institutionsDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (institutionsDetails != null)
                 {
                     lstInstitutions.Add(new GetInstitutionsModel
                     {
-                        InstitutionId = institutionsDetails.InstitutionId.ToString(),
+                        InstitutionId = ObfuscationClass.EncodeId(institutionsDetails.InstitutionId, _appSettings.Prime).ToString(),
                         Name = institutionsDetails.Name,
                         CreatedAt = institutionsDetails.CreatedAt,
                         PhoneNumber = institutionsDetails.PhoneNumber,
@@ -42,12 +49,13 @@ namespace InstitutionService.Helper.Repository
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var servicesDetails = _context.Services.Where(x => x.ServiceId == Convert.ToInt32(item.ServiceId)).FirstOrDefault();
+                var serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (servicesDetails != null)
                 {
                     lstServices.Add(new ServicesModel
                     {
-                        ServiceId = servicesDetails.ServiceId.ToString(),
+                        ServiceId = ObfuscationClass.EncodeId(servicesDetails.ServiceId, _appSettings.Prime).ToString(),
                         Name = servicesDetails.Name,
                         Description = servicesDetails.Descriptions,
                     });

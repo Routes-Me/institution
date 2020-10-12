@@ -53,7 +53,7 @@ namespace InstitutionService.Models
     public class InstitutionGetResponse : Response
     {
         public Pagination pagination { get; set; }
-        public List<GetInstitutionsModel> data { get; set; }
+        public List<InstitutionsModel> data { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject included { get; set; }
     }

@@ -1,11 +1,14 @@
 ﻿using InstitutionService.Abstraction;
 using InstitutionService.Helper.Abstraction;
+using InstitutionService.Helper.Models;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using Obfuscation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +19,11 @@ namespace InstitutionService.Repository
     {
         private readonly institutionserviceContext _context;
         private readonly IServiceInstitutionIncludedRepository _serviceInstitutionIncludedRepository;
-        public ServicesInstitutionsRepository(institutionserviceContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
+        private readonly AppSettings _appSettings;
+
+        public ServicesInstitutionsRepository(IOptions<AppSettings> appSettings, institutionserviceContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
         {
+            _appSettings = appSettings.Value;
             _context = context;
             _serviceInstitutionIncludedRepository = serviceInstitutionIncludedRepository;
         }
@@ -26,11 +32,13 @@ namespace InstitutionService.Repository
         {
             try
             {
-                var institution = _context.Institutions.Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).FirstOrDefault();
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(serviceId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
+                var institution = _context.Institutions.Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (institution == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
-                var servicesinstitutions = institution.ServicesInstitutions.Where(x => x.ServiceId == Convert.ToInt32(serviceId)).FirstOrDefault();
+                var servicesinstitutions = institution.ServicesInstitutions.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (servicesinstitutions == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceInstitutionNotFound, StatusCodes.Status404NotFound);
 
@@ -47,36 +55,38 @@ namespace InstitutionService.Repository
         {
             try
             {
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(serviceId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 ServicesInstitutionsGetResponse response = new ServicesInstitutionsGetResponse();
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).FirstOrDefault();
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
                 List<ServicesInstitutionsModel> objServicesInstitutionsModel = new List<ServicesInstitutionsModel>();
-                if (Convert.ToInt32(serviceId) == 0)
+                if (serviceIdDecrypted == 0)
                 {
                     objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
-                                                    where servicesinstitution.InstitutionId == Convert.ToInt32(institutionId)
+                                                    where servicesinstitution.InstitutionId == institutionIdDecrypted
                                                     select new ServicesInstitutionsModel()
                                                     {
-                                                        InstitutionId = servicesinstitution.InstitutionId.ToString(),
-                                                        ServiceId = servicesinstitution.ServiceId.ToString()
-                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                                        InstitutionId = ObfuscationClass.EncodeId(servicesinstitution.InstitutionId, _appSettings.Prime).ToString(),
+                                                        ServiceId = ObfuscationClass.EncodeId(servicesinstitution.ServiceId, _appSettings.Prime).ToString()
+                                                    }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId)).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionIdDecrypted).ToList().Count();
                 }
                 else
                 {
                     objServicesInstitutionsModel = (from servicesinstitution in _context.ServicesInstitutions
-                                                    where servicesinstitution.InstitutionId == Convert.ToInt32(institutionId) && servicesinstitution.ServiceId == Convert.ToInt32(serviceId)
+                                                    where servicesinstitution.InstitutionId == institutionIdDecrypted && servicesinstitution.ServiceId == serviceIdDecrypted
                                                     select new ServicesInstitutionsModel()
                                                     {
-                                                        InstitutionId = servicesinstitution.InstitutionId.ToString(),
-                                                        ServiceId = servicesinstitution.ServiceId.ToString()
-                                                    }).OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+                                                        InstitutionId = ObfuscationClass.EncodeId(servicesinstitution.InstitutionId, _appSettings.Prime).ToString(),
+                                                        ServiceId = ObfuscationClass.EncodeId(servicesinstitution.ServiceId, _appSettings.Prime).ToString()
+                                                    }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
-                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionId) && x.ServiceId == Convert.ToInt32(serviceId)).ToList().Count();
+                    totalCount = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionIdDecrypted && x.ServiceId == serviceIdDecrypted).ToList().Count();
                 }
 
                 var page = new Pagination
@@ -122,11 +132,13 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-        public dynamic InsertServicesInstitutions(string institutionsId, ServicesInstitutionsPostModel model)
+        public dynamic InsertServicesInstitutions(string institutionId, ServicesInstitutionsPostModel model)
         {
             try
             {
-                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == Convert.ToInt32(institutionsId)).FirstOrDefault();
+                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.ServiceId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
+                var InstitutionDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (InstitutionDetails == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
 
@@ -135,8 +147,8 @@ namespace InstitutionService.Repository
 
                 ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
                 {
-                    InstitutionId = Convert.ToInt32(institutionsId),
-                    ServiceId = Convert.ToInt32(model.ServiceId)
+                    InstitutionId = institutionIdDecrypted,
+                    ServiceId = serviceIdDecrypted
                 };
                 _context.ServicesInstitutions.Add(objServicesinstitutions);
                 _context.SaveChanges();
