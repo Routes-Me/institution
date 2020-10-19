@@ -138,7 +138,6 @@ namespace InstitutionService.Repository
                 if (institutionIdDecrypted == 0)
                 {
                     var modelList = (from institution in _context.Institutions
-
                                      select new InstitutionsModel()
                                      {
                                          InstitutionId = ObfuscationClass.EncodeId(institution.InstitutionId, _appSettings.Prime).ToString(),
@@ -146,7 +145,7 @@ namespace InstitutionService.Repository
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
                                          CountryIso = institution.CountryIso,
-                                         services = institution.ServicesInstitutions.Select(x => x.InstitutionId.ToString()).ToList()
+                                         services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
                                      }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     foreach (var item in modelList)
@@ -179,7 +178,7 @@ namespace InstitutionService.Repository
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
                                          CountryIso = institution.CountryIso,
-                                         services = institution.ServicesInstitutions.Select(x => x.InstitutionId.ToString()).ToList()
+                                         services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
                                      }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
 
