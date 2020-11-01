@@ -43,7 +43,7 @@ namespace InstitutionService.Models
         public static string AuthoritiesUpdate = "Authorities updated successfully.";
         public static string AuthoritiesRetrived = "Authorities retrived successfully.";
         public static string AuthoritiesNotFound = "Authorities not found.";
-        public static string GenericException = "You are not authorized to access this content.";
+        public static string ExceptionMessage = "Something went wrong. Error Message - ";
 
     }
 }
