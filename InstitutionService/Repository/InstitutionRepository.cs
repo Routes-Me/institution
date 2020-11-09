@@ -89,6 +89,35 @@ namespace InstitutionService.Repository
                 institution.CountryIso = Model.CountryIso;
                 _context.Institutions.Update(institution);
                 _context.SaveChanges();
+
+                if (Model.services != null)
+                {
+                    var servicesInstitutions = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionIdDecrypted).ToList();
+                    if (servicesInstitutions != null && servicesInstitutions.Count > 0)
+                    {
+                        foreach (var item in servicesInstitutions)
+                        {
+                            _context.ServicesInstitutions.Remove(item);
+                            _context.SaveChanges();
+                        }
+                    }
+                    foreach (var item in Model.services)
+                    {
+                        int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item), _appSettings.PrimeInverse);
+                        var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
+                        if (servicesDetails != null)
+                        {
+                            ServicesInstitutions objServicesinstitutions = new ServicesInstitutions()
+                            {
+                                InstitutionId = institutionIdDecrypted,
+                                ServiceId = serviceIdDecrypted
+                            };
+                            _context.ServicesInstitutions.Add(objServicesinstitutions);
+                            _context.SaveChanges();
+                        }
+                    }
+                }
+
                 return ReturnResponse.SuccessResponse(CommonMessage.InstitutionUpdate, false);
             }
             catch (Exception ex)
