@@ -270,5 +270,50 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
+
+        public dynamic GetInstitutionsOfficers(string institutionId, Pagination pageInfo)
+        {
+            OfficersGetResponse response = new OfficersGetResponse();
+            int totalCount = 0;
+            try
+            {
+                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
+                List<OfficersModel> officersModelList = new List<OfficersModel>();
+
+                if (institutionIdDecrypted == 0)
+                    return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
+                else
+                {
+                    officersModelList = (from officers in _context.Officers
+                                                where officers.InstitutionId == institutionIdDecrypted
+                                                select new OfficersModel()
+                                                {
+                                                    OfficerId = ObfuscationClass.EncodeId(officers.OfficerId, _appSettings.Prime).ToString(),
+                                                    UserId = ObfuscationClass.EncodeId(officers.UserId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                                    InstitutionId = ObfuscationClass.EncodeId(officers.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                                }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
+
+                    totalCount = _context.Officers.Where(x => x.InstitutionId == institutionIdDecrypted).ToList().Count();
+                }
+
+                var page = new Pagination
+                {
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
+                    total = totalCount,
+                };
+
+                response.status = true;
+                response.message = CommonMessage.OfficerRetrived;
+                response.pagination = page;
+                response.data = officersModelList;
+                response.statusCode = StatusCodes.Status200OK;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return ReturnResponse.ExceptionResponse(ex);
+            }
+        }
     }
 }

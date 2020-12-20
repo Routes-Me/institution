@@ -46,5 +46,13 @@ namespace InstitutionService.Controllers
             dynamic response = _institutionRepository.DeleteInstitution(id);
             return StatusCode((int)response.statusCode, response);
         }
+
+        [HttpGet]
+        [Route("institutions/{institutionId=0}/officers")]
+        public IActionResult GetInstitutionsOfficers(string institutionId, [FromQuery] Pagination pageInfo)
+        {
+            dynamic response = _institutionRepository.GetInstitutionsOfficers(institutionId, pageInfo);
+            return StatusCode((int)response.statusCode, response);
+        }
     }
 }
