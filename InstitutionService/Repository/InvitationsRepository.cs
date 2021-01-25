@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using InstitutionService.Helper.Models;
-using Obfuscation;
+using RoutesSecurity;
 
 namespace InstitutionService.Repository
 {
@@ -37,8 +37,8 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int invitationIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
-                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
+                int invitationIdDecrypted = Obfuscation.Decode(id);
+                int officerIdDecrypted = Obfuscation.Decode(officerId);
                 var officer = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerIdDecrypted).FirstOrDefault();
                 if (officer == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
@@ -63,36 +63,36 @@ namespace InstitutionService.Repository
             int totalCount = 0;
             try
             {
-                int invitationIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(invitationId), _appSettings.PrimeInverse);
                 List<InvitationsGetModel> objInvitationsModelList = new List<InvitationsGetModel>();
-                if (invitationIdDecrypted == 0)
+                if (string.IsNullOrEmpty(invitationId))
                 {
                     objInvitationsModelList = (from invitation in _context.Invitations
 
                                                select new InvitationsGetModel()
                                                {
-                                                   InvitationId = ObfuscationClass.EncodeId(invitation.InvitationId, _appSettings.Prime).ToString(),
+                                                   InvitationId = Obfuscation.Encode(invitation.InvitationId),
                                                    RecipientName = invitation.RecipientName,
                                                    Link = invitation.Link,
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
-                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(invitation.OfficerId), _appSettings.Prime).ToString()
+                                                   OfficerId = Obfuscation.Encode(Convert.ToInt32(invitation.OfficerId))
                                                }).AsEnumerable().OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Invitations.ToList().Count();
                 }
                 else
                 {
+                    int invitationIdDecrypted = Obfuscation.Decode(invitationId);
                     objInvitationsModelList = (from invitation in _context.Invitations
                                                where invitation.InvitationId == invitationIdDecrypted
                                                select new InvitationsGetModel()
                                                {
-                                                   InvitationId = ObfuscationClass.EncodeId(invitation.InvitationId, _appSettings.Prime).ToString(),
+                                                   InvitationId = Obfuscation.Encode(invitation.InvitationId),
                                                    RecipientName = invitation.RecipientName,
                                                    Link = invitation.Link,
                                                    Address = invitation.Address,
                                                    Data = invitation.Data,
-                                                   OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(invitation.OfficerId), _appSettings.Prime).ToString()
+                                                   OfficerId = Obfuscation.Encode(Convert.ToInt32(invitation.OfficerId))
                                                }).AsEnumerable().OrderBy(a => a.InvitationId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Invitations.Where(x => x.InvitationId == invitationIdDecrypted).ToList().Count();
@@ -122,8 +122,8 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
+                int officerIdDecrypted = Obfuscation.Decode(officerId);
+                int institutionIdDecrypted = Obfuscation.Decode(model.InstitutionId);
                 byte[] Data;
                 string Address = string.Empty, Hash = string.Empty;
                 bool IsEmail = false;
@@ -165,7 +165,7 @@ namespace InstitutionService.Repository
                 _context.Invitations.Add(invitation);
                 _context.SaveChanges();
 
-                var encryptedInstitutionId = CryptographyHelper.Encrypt(ObfuscationClass.EncodeId(invitation.InvitationId, _appSettings.Prime).ToString());
+                var encryptedInstitutionId = CryptographyHelper.Encrypt(Obfuscation.Encode(invitation.InvitationId));
 
                 invitation.Link = "routesdashboard.com?invitationid=" + encryptedInstitutionId;
                 _context.Invitations.Update(invitation);

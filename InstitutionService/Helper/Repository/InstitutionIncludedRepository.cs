@@ -6,7 +6,7 @@ using InstitutionService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace InstitutionService.Helper.Repository
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objInstitutionsModelList)
             {
-                var institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var institutionIdDecrypted = Obfuscation.Decode(item.InstitutionId);
                 var servicesInstitutionDetails = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionIdDecrypted).ToList();
                 if (servicesInstitutionDetails != null && servicesInstitutionDetails.Count > 0)
                 {
@@ -41,7 +41,7 @@ namespace InstitutionService.Helper.Repository
                             {
                                 lstServices.Add(new ServicesModel
                                 {
-                                    ServiceId = ObfuscationClass.EncodeId(serviceData.ServiceId, _appSettings.Prime).ToString(),
+                                    ServiceId = Obfuscation.Encode(serviceData.ServiceId),
                                     Name = serviceData.Name,
                                     Description = serviceData.Descriptions,
                                 });
