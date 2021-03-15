@@ -4,7 +4,7 @@ using InstitutionService.Helper.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +26,13 @@ namespace InstitutionService.Helper.Repository
             List<GetInstitutionsModel> lstInstitutions = new List<GetInstitutionsModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var institutionIdDecrypted = Obfuscation.Decode(item.InstitutionId);
                 var institutionsDetails = _context.Institutions.Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (institutionsDetails != null)
                 {
                     lstInstitutions.Add(new GetInstitutionsModel
                     {
-                        InstitutionId = ObfuscationClass.EncodeId(institutionsDetails.InstitutionId, _appSettings.Prime).ToString(),
+                        InstitutionId = Obfuscation.Encode(institutionsDetails.InstitutionId),
                         Name = institutionsDetails.Name,
                         CreatedAt = institutionsDetails.CreatedAt,
                         PhoneNumber = institutionsDetails.PhoneNumber,
@@ -49,13 +49,13 @@ namespace InstitutionService.Helper.Repository
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objServicesInstitutionsModel)
             {
-                var serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item.InstitutionId), _appSettings.PrimeInverse);
+                var serviceIdDecrypted = Obfuscation.Decode(item.InstitutionId);
                 var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (servicesDetails != null)
                 {
                     lstServices.Add(new ServicesModel
                     {
-                        ServiceId = ObfuscationClass.EncodeId(servicesDetails.ServiceId, _appSettings.Prime).ToString(),
+                        ServiceId = Obfuscation.Encode(servicesDetails.ServiceId),
                         Name = servicesDetails.Name,
                         Description = servicesDetails.Descriptions,
                     });

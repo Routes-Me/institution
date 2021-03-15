@@ -40,10 +40,10 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("officers/{officersId=0}")]
-        public IActionResult Get(string officersId, string userId, string include, [FromQuery] Pagination pageInfo)
+        [Route("officers/{officerId?}")]
+        public IActionResult Get(string officerId, string userId, string include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _officersRepository.GetOfficers(officersId, userId, include, pageInfo);
+            dynamic response = _officersRepository.GetOfficers(officerId, userId, include, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
 

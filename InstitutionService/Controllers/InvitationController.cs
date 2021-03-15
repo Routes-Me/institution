@@ -33,7 +33,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("invitations/{invitationId=0}")]
+        [Route("invitations/{invitationId?}")]
         public IActionResult Get(string invitationId, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _invitionRepository.GetInvitation(invitationId, pageInfo);

@@ -16,26 +16,26 @@ namespace InstitutionService.Controllers
         }
 
         [HttpPost]
-        [Route("institutions/{institutionsId=0}/services")]
-        public IActionResult Post(string institutionsId, ServicesInstitutionsPostModel Model)
+        [Route("institutions/{institutionId}/services")]
+        public IActionResult Post(string institutionId, ServicesInstitutionsPostModel Model)
         {
-            dynamic response = _servicesInstitutionsRepository.InsertServicesInstitutions(institutionsId, Model);
+            dynamic response = _servicesInstitutionsRepository.InsertServicesInstitutions(institutionId, Model);
             return StatusCode((int)response.statusCode, response);
         }
 
         [HttpDelete]
-        [Route("institutions/{institutionsId=0}/services/{servicesId}")]
-        public IActionResult Delete(string institutionsId, string servicesId)
+        [Route("institutions/{institutionId}/services/{serviceId}")]
+        public IActionResult Delete(string institutionId, string serviceId)
         {
-            dynamic response = _servicesInstitutionsRepository.DeleteServicesInstitutions(institutionsId, servicesId);
+            dynamic response = _servicesInstitutionsRepository.DeleteServicesInstitutions(institutionId, serviceId);
             return StatusCode((int)response.statusCode, response);
         }
 
         [HttpGet]
-        [Route("institutions/{institutionId=0}/services/{servicesId=0}")]
-        public IActionResult Get(string institutionId, string servicesId, string include, [FromQuery] Pagination pageInfo)
+        [Route("institutions/{institutionId}/services/{serviceId?}")]
+        public IActionResult Get(string institutionId, string serviceId, string include, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, servicesId, include, pageInfo);
+            dynamic response = _servicesInstitutionsRepository.GetServicesInstitutions(institutionId, serviceId, include, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
     }

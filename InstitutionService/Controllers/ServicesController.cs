@@ -40,10 +40,10 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]   
-        [Route("services/{servicesId=0}")]
-        public IActionResult Get(string servicesId, [FromQuery] Pagination pageInfo)
+        [Route("services/{serviceId}")]
+        public IActionResult Get(string serviceId, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _serviceRepository.GetServices(servicesId, pageInfo);
+            dynamic response = _serviceRepository.GetServices(serviceId, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
     }

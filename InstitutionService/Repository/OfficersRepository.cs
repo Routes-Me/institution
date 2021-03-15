@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using InstitutionService.Helper.Models;
 using Microsoft.Extensions.Options;
-using Obfuscation;
+using RoutesSecurity;
 
 namespace InstitutionService.Repository
 {
@@ -32,7 +32,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
+                int officerIdDecrypted = Obfuscation.Decode(officerId);
                 var officers = _context.Officers.Include(x => x.Invitations).Where(x => x.OfficerId == officerIdDecrypted).FirstOrDefault();
                 if (officers == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.OfficerNotFound, StatusCodes.Status404NotFound);
@@ -56,14 +56,12 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(officerId), _appSettings.PrimeInverse);
-                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(userId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 OfficersGetResponse response = new OfficersGetResponse();
                 List<OfficersModel> objOfficersModelList = new List<OfficersModel>();
-                if (Convert.ToInt32(officerIdDecrypted) == 0)
+                if (string.IsNullOrEmpty(officerId))
                 {
-                    if (Convert.ToInt32(userIdDecrypted) == 0)
+                    if (string.IsNullOrEmpty(userId))
                     {
                         objOfficersModelList = (from officer in _context.Officers
                                                 select new OfficersModel()
@@ -77,6 +75,7 @@ namespace InstitutionService.Repository
                     }
                     else
                     {
+                        int userIdDecrypted = Obfuscation.Decode(userId);
                         objOfficersModelList = (from officer in _context.Officers
                                                 where officer.UserId == Convert.ToInt32(userIdDecrypted)
                                                 select new OfficersModel()
@@ -91,8 +90,9 @@ namespace InstitutionService.Repository
                 }
                 else
                 {
-                    if (Convert.ToInt32(userIdDecrypted) == 0)
+                    if (string.IsNullOrEmpty(userId))
                     {
+                        int officerIdDecrypted = Obfuscation.Decode(officerId);
                         objOfficersModelList = (from officer in _context.Officers
                                                 where officer.OfficerId == Convert.ToInt32(officerIdDecrypted)
                                                 select new OfficersModel()
@@ -106,6 +106,8 @@ namespace InstitutionService.Repository
                     }
                     else
                     {
+                        int officerIdDecrypted = Obfuscation.Decode(officerId);
+                        int userIdDecrypted = Obfuscation.Decode(userId);
                         objOfficersModelList = (from officer in _context.Officers
                                                 where officer.OfficerId == Convert.ToInt32(officerIdDecrypted)
                                                 && officer.UserId == Convert.ToInt32(userIdDecrypted)
@@ -125,9 +127,9 @@ namespace InstitutionService.Repository
                     foreach (var item in objOfficersModelList)
                     {
                         OfficersModel obj = new OfficersModel();
-                        obj.OfficerId = ObfuscationClass.EncodeId(Convert.ToInt32(item.OfficerId), _appSettings.Prime).ToString();
-                        obj.InstitutionId = ObfuscationClass.EncodeId(Convert.ToInt32(item.InstitutionId), _appSettings.Prime).ToString();
-                        obj.UserId = ObfuscationClass.EncodeId(Convert.ToInt32(item.UserId), _appSettings.Prime).ToString();
+                        obj.OfficerId = Obfuscation.Encode(Convert.ToInt32(item.OfficerId));
+                        obj.InstitutionId = Obfuscation.Encode(Convert.ToInt32(item.InstitutionId));
+                        obj.UserId = Obfuscation.Encode(Convert.ToInt32(item.UserId));
                         objOfficersModelListNew.Add(obj);
                     }
                 }
@@ -180,8 +182,8 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
-                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.UserId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = Obfuscation.Decode(model.InstitutionId);
+                int userIdDecrypted = Obfuscation.Decode(model.UserId);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
@@ -208,9 +210,9 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int officerIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.OfficerId), _appSettings.PrimeInverse);
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.InstitutionId), _appSettings.PrimeInverse);
-                int userIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.UserId), _appSettings.PrimeInverse);
+                int officerIdDecrypted = Obfuscation.Decode(model.OfficerId);
+                int institutionIdDecrypted = Obfuscation.Decode(model.InstitutionId);
+                int userIdDecrypted = Obfuscation.Decode(model.UserId);
                 if (model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 

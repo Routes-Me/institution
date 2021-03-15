@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +50,7 @@ namespace InstitutionService.Repository
                 {
                     foreach (var item in Model.services)
                     {
-                        int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item), _appSettings.PrimeInverse);
+                        int serviceIdDecrypted = Obfuscation.Decode(item);
                         var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                         if (servicesDetails != null)
                         {
@@ -76,7 +76,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(Model.InstitutionId), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = Obfuscation.Decode(Model.InstitutionId);
                 if (Model == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.BadRequest, StatusCodes.Status400BadRequest);
 
@@ -103,7 +103,7 @@ namespace InstitutionService.Repository
                     }
                     foreach (var item in Model.services)
                     {
-                        int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(item), _appSettings.PrimeInverse);
+                        int serviceIdDecrypted = Obfuscation.Decode(item);
                         var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                         if (servicesDetails != null)
                         {
@@ -130,7 +130,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int institutionIdDecrypted = Obfuscation.Decode(id);
                 var institution = _context.Institutions.Include(x => x.Officers).Include(x => x.ServicesInstitutions).Where(x => x.InstitutionId == institutionIdDecrypted).FirstOrDefault();
                 if (institution == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
@@ -160,16 +160,15 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 InstitutionGetResponse response = new InstitutionGetResponse();
                 List<InstitutionsModel> objInstitutionsModelList = new List<InstitutionsModel>();
-                if (institutionIdDecrypted == 0)
+                if (string.IsNullOrEmpty(institutionId))
                 {
                     var modelList = (from institution in _context.Institutions
                                      select new InstitutionsModel()
                                      {
-                                         InstitutionId = ObfuscationClass.EncodeId(institution.InstitutionId, _appSettings.Prime).ToString(),
+                                         InstitutionId = Obfuscation.Encode(institution.InstitutionId),
                                          Name = institution.Name,
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
@@ -188,7 +187,7 @@ namespace InstitutionService.Repository
                         model.CountryIso = item.CountryIso;
                         foreach (var item1 in item.services)
                         {
-                            services.Add(ObfuscationClass.EncodeId(Convert.ToInt32(item1), _appSettings.Prime).ToString());
+                            services.Add(Obfuscation.Encode(Convert.ToInt32(item1)));
                             model.services = services;
                         }
                         objInstitutionsModelList.Add(model);
@@ -198,11 +197,12 @@ namespace InstitutionService.Repository
                 }
                 else
                 {
+                    int institutionIdDecrypted = Obfuscation.Decode(institutionId);
                     var modelList = (from institution in _context.Institutions
                                      where institution.InstitutionId == institutionIdDecrypted
                                      select new InstitutionsModel()
                                      {
-                                         InstitutionId = ObfuscationClass.EncodeId(institution.InstitutionId, _appSettings.Prime).ToString(),
+                                         InstitutionId = Obfuscation.Encode(institution.InstitutionId),
                                          Name = institution.Name,
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
@@ -222,7 +222,7 @@ namespace InstitutionService.Repository
                         model.CountryIso = item.CountryIso;
                         foreach (var item1 in item.services)
                         {
-                            services.Add(ObfuscationClass.EncodeId(Convert.ToInt32(item1), _appSettings.Prime).ToString());
+                            services.Add(Obfuscation.Encode(Convert.ToInt32(item1)));
                             model.services = services;
                         }
                         objInstitutionsModelList.Add(model);
@@ -270,27 +270,26 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-
         public dynamic GetInstitutionsOfficers(string institutionId, Pagination pageInfo)
         {
             OfficersGetResponse response = new OfficersGetResponse();
             int totalCount = 0;
             try
             {
-                int institutionIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(institutionId), _appSettings.PrimeInverse);
                 List<OfficersModel> officersModelList = new List<OfficersModel>();
 
-                if (institutionIdDecrypted == 0)
+                if (string.IsNullOrEmpty(institutionId))
                     return ReturnResponse.ErrorResponse(CommonMessage.InstitutionNotFound, StatusCodes.Status404NotFound);
                 else
                 {
+                    int institutionIdDecrypted = Obfuscation.Decode(institutionId);
                     officersModelList = (from officers in _context.Officers
                                                 where officers.InstitutionId == institutionIdDecrypted
                                                 select new OfficersModel()
                                                 {
-                                                    OfficerId = ObfuscationClass.EncodeId(officers.OfficerId, _appSettings.Prime).ToString(),
-                                                    UserId = ObfuscationClass.EncodeId(officers.UserId.GetValueOrDefault(), _appSettings.Prime).ToString(),
-                                                    InstitutionId = ObfuscationClass.EncodeId(officers.InstitutionId.GetValueOrDefault(), _appSettings.Prime).ToString(),
+                                                    OfficerId = Obfuscation.Encode(officers.OfficerId),
+                                                    UserId = Obfuscation.Encode(officers.UserId.GetValueOrDefault()),
+                                                    InstitutionId = Obfuscation.Encode(officers.InstitutionId.GetValueOrDefault()),
                                                 }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     totalCount = _context.Officers.Where(x => x.InstitutionId == institutionIdDecrypted).ToList().Count();

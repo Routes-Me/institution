@@ -25,10 +25,10 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("institutions/authorities/{id=0}")]
-        public IActionResult Get(string id, [FromQuery] Pagination pageInfo)
+        [Route("institutions/authorities/{authorityId?}")]
+        public IActionResult Get(string authorityId, [FromQuery] Pagination pageInfo)
         {
-            dynamic response = _authoritiesRepository.GetAuthorities(id, pageInfo);
+            dynamic response = _authoritiesRepository.GetAuthorities(authorityId, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
 

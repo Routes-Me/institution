@@ -16,7 +16,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("institutions/{institutionId=0}")]
+        [Route("institutions/{institutionId?}")]
         public IActionResult GeInstitutions(string institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);

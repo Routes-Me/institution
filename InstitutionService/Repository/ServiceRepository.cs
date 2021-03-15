@@ -6,7 +6,7 @@ using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Obfuscation;
+using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(id), _appSettings.PrimeInverse);
+                int serviceIdDecrypted = Obfuscation.Decode(id);
                 var service = _context.Services.Include(x => x.ServicesInstitutions).Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (service == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
@@ -46,20 +46,19 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
-        public dynamic GetServices(string servicesId, Pagination pageInfo)
+        public dynamic GetServices(string serviceId, Pagination pageInfo)
         {
             try
             {
-                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(servicesId), _appSettings.PrimeInverse);
                 int totalCount = 0;
                 ServicesGetResponse response = new ServicesGetResponse();
                 List<ServicesModel> objServicesModelList = new List<ServicesModel>();
-                if (serviceIdDecrypted == 0)
+                if (string.IsNullOrEmpty(serviceId))
                 {
                     objServicesModelList = (from services in _context.Services
                                             select new ServicesModel()
                                             {
-                                                ServiceId = ObfuscationClass.EncodeId(services.ServiceId, _appSettings.Prime).ToString(),
+                                                ServiceId = Obfuscation.Encode(services.ServiceId),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
                                             }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
@@ -68,11 +67,12 @@ namespace InstitutionService.Repository
                 }
                 else
                 {
+                    int serviceIdDecrypted = Obfuscation.Decode(serviceId);
                     objServicesModelList = (from services in _context.Services
                                             where services.ServiceId == serviceIdDecrypted
                                             select new ServicesModel()
                                             {
-                                                ServiceId = ObfuscationClass.EncodeId(services.ServiceId, _appSettings.Prime).ToString(),
+                                                ServiceId = Obfuscation.Encode(services.ServiceId),
                                                 Name = services.Name,
                                                 Description = services.Descriptions,
                                             }).AsEnumerable().OrderBy(a => a.ServiceId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
@@ -123,7 +123,7 @@ namespace InstitutionService.Repository
         {
             try
             {
-                int serviceIdDecrypted = ObfuscationClass.DecodeId(Convert.ToInt32(model.ServiceId), _appSettings.PrimeInverse);
+                int serviceIdDecrypted = Obfuscation.Decode(model.ServiceId);
                 var servicesData = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
                 if (servicesData == null)
                     return ReturnResponse.ErrorResponse(CommonMessage.ServiceNotFound, StatusCodes.Status404NotFound);
