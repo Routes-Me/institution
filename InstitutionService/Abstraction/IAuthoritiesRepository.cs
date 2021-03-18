@@ -10,7 +10,7 @@ namespace InstitutionService.Abstraction
     public interface IAuthoritiesRepository
     {
         dynamic DeleteAuthorities(string id);
-        dynamic GetAuthorities(string id, Pagination pageInfo);
+        dynamic GetAuthorities(string authorityId, Pagination pageInfo);
         dynamic GetAuthoritiesByInstitutionId(string id, Pagination pageInfo);
         dynamic InsertAuthorities(AuthoritiesModel model);
         dynamic UpdateAuthorities(AuthoritiesModel model);

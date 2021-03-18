@@ -16,7 +16,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("institutions/{institutionId=0}")]
+        [Route("institutions/{institutionId?}")]
         public IActionResult GeInstitutions(string institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
@@ -44,6 +44,14 @@ namespace InstitutionService.Controllers
         public IActionResult Delete(string id)
         {
             dynamic response = _institutionRepository.DeleteInstitution(id);
+            return StatusCode((int)response.statusCode, response);
+        }
+
+        [HttpGet]
+        [Route("institutions/{institutionId}/officers")]
+        public IActionResult GetInstitutionsOfficers(string institutionId, [FromQuery] Pagination pageInfo)
+        {
+            dynamic response = _institutionRepository.GetInstitutionsOfficers(institutionId, pageInfo);
             return StatusCode((int)response.statusCode, response);
         }
     }
