@@ -23,6 +23,14 @@ namespace InstitutionService.Controllers
             return StatusCode((int)response.statusCode, response);
         }
 
+        [HttpGet]
+        [Route("v1/institutions/{institutionId?}")]
+        public IActionResult GeInstitutionsV1(string institutionId, string include, [FromQuery] Pagination pageInfo)
+        {
+            dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
+            return StatusCode(response.statusCode, response);
+        }
+
         [HttpPost]
         [Route("institutions")]
         public IActionResult Post(InstitutionsModel Model)
