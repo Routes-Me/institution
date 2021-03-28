@@ -8,10 +8,10 @@ namespace InstitutionService.Controllers
     [ApiController]
     [ApiVersion( "1.0" )]
     [Route("api/v{version:apiVersion}/")]
-    public class ServicesControllerVersion1 : ControllerBase
+    public class ServicesVersionedController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
-        public ServicesControllerVersion1(IServiceRepository serviceRepository)
+        public ServicesVersionedController(IServiceRepository serviceRepository)
         {
             _serviceRepository = serviceRepository;
         }
