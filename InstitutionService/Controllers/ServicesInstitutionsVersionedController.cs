@@ -7,7 +7,7 @@ namespace InstitutionService.Controllers
 {
     [ApiController]
     [ApiVersion( "1.0" )]
-    [Route("api/v{version:apiVersion}/")]
+    [Route("v{version:apiVersion}/")]
     public class ServicesInstitutionsVersionedController : ControllerBase
     {
         private readonly IServicesInstitutionsRepository _servicesInstitutionsRepository;

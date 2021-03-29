@@ -8,7 +8,7 @@ namespace InstitutionService.Controllers
 {
     [ApiController]
     [ApiVersion( "1.0" )]
-    [Route("api/v{version:apiVersion}/")]
+    [Route("v{version:apiVersion}/")]
     public class AuthoritiesVersionedController : ControllerBase
     {
         private readonly IAuthoritiesRepository _authoritiesRepository;

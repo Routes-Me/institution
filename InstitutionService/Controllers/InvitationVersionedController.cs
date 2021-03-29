@@ -8,7 +8,7 @@ namespace InstitutionService.Controllers
 {
     [ApiController]
     [ApiVersion( "1.0" )]
-    [Route("api/v{version:apiVersion}/")]
+    [Route("v{version:apiVersion}/")]
     public class InvitationVersionedController : ControllerBase
     {
         private readonly IInvitationsRepository _invitionRepository;
