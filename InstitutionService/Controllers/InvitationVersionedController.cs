@@ -7,11 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace InstitutionService.Controllers
 {
     [ApiController]
-    [Route("v1")]
-    public class InvitationControllerVersion1 : ControllerBase
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
+    public class InvitationVersionedController : ControllerBase
     {
         private readonly IInvitationsRepository _invitionRepository;
-        public InvitationControllerVersion1(IInvitationsRepository invitionRepository)
+        public InvitationVersionedController(IInvitationsRepository invitionRepository)
         {
             _invitionRepository = invitionRepository;
         }
