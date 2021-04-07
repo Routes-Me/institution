@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InstitutionService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class AuthoritiesController : ControllerBase
     {
         private readonly IAuthoritiesRepository _authoritiesRepository;

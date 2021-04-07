@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InstitutionService.Controllers
 {
-    [Route("api")]
     [ApiController]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class InvitationController : ControllerBase
     {
         private readonly IInvitationsRepository _invitionRepository;

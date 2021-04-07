@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace InstitutionService.Controllers
 {
     [ApiController]
-    [Route("api")]
+    [ApiVersion( "1.0" )]
+    [Route("v{version:apiVersion}/")]
     public class ServicesController : ControllerBase
     {
         private readonly IServiceRepository _serviceRepository;
