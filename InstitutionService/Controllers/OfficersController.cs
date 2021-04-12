@@ -2,6 +2,8 @@
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace InstitutionService.Controllers
 {
@@ -21,7 +23,7 @@ namespace InstitutionService.Controllers
         public IActionResult Post(OfficersModel Model)
         {
             dynamic response = _officersRepository.InsertOfficers(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPut]
@@ -29,7 +31,7 @@ namespace InstitutionService.Controllers
         public IActionResult Put(OfficersModel Model)
         {
             dynamic response = _officersRepository.UpdateOfficers(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpDelete]
@@ -37,7 +39,7 @@ namespace InstitutionService.Controllers
         public IActionResult Delete(string officersId)
         {
             dynamic response = _officersRepository.DeleteOfficers(officersId);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpGet]
@@ -45,9 +47,27 @@ namespace InstitutionService.Controllers
         public IActionResult Get(string officerId, string userId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _officersRepository.GetOfficers(officerId, userId, include, pageInfo);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
-
+        [HttpGet]
+        [Route("officers")]
+        public IActionResult GetOfficerId(string userId)
+        {
+            GetOfficerIdResponse response = new GetOfficerIdResponse();
+            try
+            {
+                response.OfficerId = _officersRepository.GetOfficerId(userId);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return StatusCode(StatusCodes.Status422UnprocessableEntity, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, CommonMessage.ExceptionMessage + ex.Message);
+            }
+            return StatusCode(StatusCodes.Status200OK, response);
+        }
     }
 }

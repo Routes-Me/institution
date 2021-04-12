@@ -81,6 +81,10 @@ namespace InstitutionService.Models
         public Pagination pagination { get; set; }
         public List<UserModel> data { get; set; }
     }
+    public class GetOfficerIdResponse
+    {
+        public string OfficerId { get; set; }
+    }
     #endregion
 
     #region ServicesInstitutions Response
