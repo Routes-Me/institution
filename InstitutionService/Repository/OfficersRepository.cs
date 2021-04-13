@@ -241,8 +241,11 @@ namespace InstitutionService.Repository
             if (string.IsNullOrEmpty(userId))
                 throw new ArgumentNullException(CommonMessage.MissingUserId);
 
-            int officerId = _context.Officers.Where(o => o.UserId == Obfuscation.Decode(userId)).FirstOrDefault().OfficerId;
-            return Obfuscation.Encode(officerId);
+            Officers officer = _context.Officers.Where(o => o.UserId == Obfuscation.Decode(userId)).FirstOrDefault();
+            if (officer == null)
+                throw new ArgumentException(CommonMessage.OfficerNotFound);
+
+            return Obfuscation.Encode(officer.OfficerId);
         }
     }
 }

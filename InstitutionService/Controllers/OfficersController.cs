@@ -51,7 +51,7 @@ namespace InstitutionService.Controllers
         }
 
         [HttpGet]
-        [Route("officers")]
+        [Route("officers/officerIds")]
         public IActionResult GetOfficerId(string userId)
         {
             GetOfficerIdResponse response = new GetOfficerIdResponse();
@@ -63,9 +63,13 @@ namespace InstitutionService.Controllers
             {
                 return StatusCode(StatusCodes.Status422UnprocessableEntity, ex.Message);
             }
+            catch (ArgumentException ex)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
+            }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, CommonMessage.ExceptionMessage + ex.Message);
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
             }
             return StatusCode(StatusCodes.Status200OK, response);
         }
