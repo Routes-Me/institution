@@ -235,5 +235,17 @@ namespace InstitutionService.Repository
                 return ReturnResponse.ExceptionResponse(ex);
             }
         }
+
+        public dynamic GetOfficerId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentNullException(CommonMessage.MissingUserId);
+
+            Officers officer = _context.Officers.Where(o => o.UserId == Obfuscation.Decode(userId)).FirstOrDefault();
+            if (officer == null)
+                throw new ArgumentException(CommonMessage.OfficerNotFound);
+
+            return Obfuscation.Encode(officer.OfficerId);
+        }
     }
 }

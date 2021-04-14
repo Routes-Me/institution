@@ -25,6 +25,7 @@ namespace InstitutionService.Models
         public static string OfficerUpdate = "Officer updated successfully.";
         public static string OfficerRetrived = "Officers retrived successfully.";
         public static string OfficerNotFound = "Officer not found.";
+        public static string MissingUserId = "UserId is missed. Request cannot be handled";
 
         public static string ServiceInsert = "Service inserted successfully.";
         public static string ServiceDelete = "Service deleted successfully.";
