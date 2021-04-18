@@ -2,7 +2,6 @@
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using System;
 
 namespace InstitutionService.Controllers
@@ -48,30 +47,6 @@ namespace InstitutionService.Controllers
         {
             dynamic response = _officersRepository.GetOfficers(officerId, userId, include, pageInfo);
             return StatusCode(response.statusCode, response);
-        }
-
-        [HttpGet]
-        [Route("officers/officerIds")]
-        public IActionResult GetOfficerId(string userId)
-        {
-            GetOfficerIdResponse response = new GetOfficerIdResponse();
-            try
-            {
-                response.OfficerId = _officersRepository.GetOfficerId(userId);
-            }
-            catch (ArgumentNullException ex)
-            {
-                return StatusCode(StatusCodes.Status422UnprocessableEntity, ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
-            }
-            return StatusCode(StatusCodes.Status200OK, response);
         }
     }
 }
