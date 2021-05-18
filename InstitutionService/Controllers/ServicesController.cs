@@ -21,7 +21,7 @@ namespace InstitutionService.Controllers
         public IActionResult Post(ServicesModel Model)
         {
             dynamic response = _serviceRepository.InsertService(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPut]
@@ -29,7 +29,7 @@ namespace InstitutionService.Controllers
         public IActionResult Put(ServicesModel Model)
         {
             dynamic response = _serviceRepository.UpdateService(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpDelete]
@@ -37,7 +37,7 @@ namespace InstitutionService.Controllers
         public IActionResult Delete(string id)
         {
             dynamic response = _serviceRepository.DeleteService(id);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpGet]   
@@ -45,7 +45,7 @@ namespace InstitutionService.Controllers
         public IActionResult Get(string serviceId, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _serviceRepository.GetServices(serviceId, pageInfo);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
     }
 }
