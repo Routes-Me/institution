@@ -45,20 +45,14 @@ namespace InstitutionService
             });
 
             services.Configure<SendGridSettings>(Configuration.GetSection("SendGridSettings"));
-            services.AddScoped<IHelperRepository, HelperRepository>();
             services.AddScoped<IInstitutionRepository, InstitutionRepository>();
-            services.AddScoped<IInvitationsRepository, InvitationsRepository>();
             services.AddScoped<IOfficersRepository, OfficersRepository>();
             services.AddScoped<IServicesInstitutionsRepository, ServicesInstitutionsRepository>();
             services.AddScoped<IServiceRepository, ServiceRepository>();
-            services.AddScoped<IMessageSender, MessageSender>();
             services.AddScoped<IServiceInstitutionIncludedRepository, ServiceInstitutionIncludedRepository>();
             services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
             services.AddScoped<IInstitutionIncludedRepository, InstitutionIncludedRepository>();
             services.AddScoped<IAuthoritiesRepository, AuthoritiesRepository>();
-
-            services.AddSingleton<IMessageSender>(new MessageSender(
-                Configuration.GetSection("TwilioSMS").Get<Configuration.TwilioSMS>()));
 
             var dependenciessSection = Configuration.GetSection("Dependencies");
             services.Configure<Dependencies>(dependenciessSection);

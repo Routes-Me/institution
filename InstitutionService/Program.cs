@@ -23,7 +23,6 @@ namespace InstitutionService
             return WebHost.CreateDefaultBuilder(args).ConfigureAppConfiguration((hostingContext, config) =>
             {
                 config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("twiliosms.json", optional: false, reloadOnChange: false);
             })
                 .UseStartup<Startup>();
         }
