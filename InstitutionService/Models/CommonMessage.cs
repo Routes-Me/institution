@@ -45,6 +45,7 @@ namespace InstitutionService.Models
         public static string AuthoritiesRetrived = "Authorities retrived successfully.";
         public static string AuthoritiesNotFound = "Authorities not found.";
         public static string ExceptionMessage = "Something went wrong. Error Message - ";
+        public static string ConnectionFailure = "Request cannot be executed: unable to establish connection with the targeted machine.";
 
     }
 }

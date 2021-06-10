@@ -48,6 +48,11 @@ namespace InstitutionService.Models
         }
     }
 
+    public class ErrorResponse
+    {
+        public string Error { get; set; }
+    }
+
     #region Institution Response
 
     public class InstitutionGetResponse : Response
@@ -81,6 +86,21 @@ namespace InstitutionService.Models
         public Pagination pagination { get; set; }
         public List<UserModel> data { get; set; }
     }
+    #endregion
+
+    #region Vehicles Response
+
+    public class VehicleGetResponse
+    {
+        public List<VehiclesDto> data { get; set; }
+    }
+
+    public class DevicesGetResponse
+    {
+        public Pagination pagination { get; set; }
+        public List<DevicesDto> data { get; set; }
+    }
+
     #endregion
 
     #region ServicesInstitutions Response

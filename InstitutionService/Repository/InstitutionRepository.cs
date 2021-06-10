@@ -7,12 +7,14 @@ using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RoutesSecurity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Net;
+using RestSharp;
 
 namespace InstitutionService.Repository
 {
@@ -21,10 +23,12 @@ namespace InstitutionService.Repository
         private readonly institutionserviceContext _context;
         private readonly IInstitutionIncludedRepository _institutionIncludedRepository;
         private readonly AppSettings _appSettings;
+        private readonly Dependencies _dependencies;
 
-        public InstitutionRepository(IOptions<AppSettings> appSettings, institutionserviceContext context, IInstitutionIncludedRepository institutionIncludedRepository)
+        public InstitutionRepository(IOptions<AppSettings> appSettings, IOptions<Dependencies> dependencies, institutionserviceContext context, IInstitutionIncludedRepository institutionIncludedRepository)
         {
             _appSettings = appSettings.Value;
+            _dependencies = dependencies.Value;
             _context = context;
             _institutionIncludedRepository = institutionIncludedRepository;
         }
@@ -313,6 +317,59 @@ namespace InstitutionService.Repository
             {
                 return ReturnResponse.ExceptionResponse(ex);
             }
+        }
+
+        public dynamic GetInstitutionsDevices(string institutionId, Pagination pageInfo)
+        {
+            if (string.IsNullOrEmpty(institutionId))
+                throw new ArgumentNullException(CommonMessage.BadRequest);
+
+            List<VehiclesDto> VehiclesDtosList = JsonConvert.DeserializeObject<VehicleGetResponse>(GetAPI(_dependencies.InstitutionVehiclesUrl.Replace("|id|", institutionId)).Content).data;
+
+            List<DevicesDto> devicesDtosList = new List<DevicesDto>();
+            VehiclesDtosList.ForEach(vehicle => {
+                List<DevicesDto> vehicleDevicesList = JsonConvert.DeserializeObject<DevicesGetResponse>(GetAPI(_dependencies.VehicleDevicesUrl.Replace("|id|", vehicle.VehicleId)).Content).data;
+                vehicleDevicesList.ForEach(device => {
+                    devicesDtosList.Add(device);
+                });
+            });
+
+            return new DevicesGetResponse
+            {
+                data = devicesDtosList,
+                pagination = new Pagination
+                {
+                    offset = pageInfo.offset,
+                    limit = pageInfo.limit,
+                    total = devicesDtosList.Count,
+                }
+            };
+        }
+
+        private dynamic GetAPI(string url, string query = "")
+        {
+            UriBuilder uriBuilder = new UriBuilder(_appSettings.Host + url);
+            uriBuilder = AppendQueryToUrl(uriBuilder, query);
+            var client = new RestClient(uriBuilder.Uri);
+            var request = new RestRequest(Method.GET);
+            IRestResponse response = client.Execute(request);
+
+            if (response.StatusCode == 0)
+                throw new HttpListenerException(400, CommonMessage.ConnectionFailure);
+
+            if (!response.IsSuccessful)
+                throw new HttpListenerException((int)response.StatusCode, response.Content);
+
+            return response;
+        }
+
+        private UriBuilder AppendQueryToUrl(UriBuilder baseUri, string queryToAppend)
+        {
+            if (baseUri.Query != null && baseUri.Query.Length > 1)
+                baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+            else
+                baseUri.Query = queryToAppend;
+            return baseUri;
         }
     }
 }

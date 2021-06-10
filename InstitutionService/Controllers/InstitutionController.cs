@@ -2,6 +2,8 @@
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace InstitutionService.Controllers
 {
@@ -21,7 +23,7 @@ namespace InstitutionService.Controllers
         public IActionResult GeInstitutions(string institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpGet]
@@ -37,7 +39,7 @@ namespace InstitutionService.Controllers
         public IActionResult Post(InstitutionsModel Model)
         {
             dynamic response = _institutionRepository.InsertInstitutions(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpPut]
@@ -45,7 +47,7 @@ namespace InstitutionService.Controllers
         public IActionResult Put(InstitutionsModel Model)
         {
             dynamic response = _institutionRepository.UpdateInstitution(Model);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpDelete]
@@ -53,7 +55,7 @@ namespace InstitutionService.Controllers
         public IActionResult Delete(string id)
         {
             dynamic response = _institutionRepository.DeleteInstitution(id);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
         }
 
         [HttpGet]
@@ -61,7 +63,23 @@ namespace InstitutionService.Controllers
         public IActionResult GetInstitutionsOfficers(string institutionId, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutionsOfficers(institutionId, pageInfo);
-            return StatusCode((int)response.statusCode, response);
+            return StatusCode(response.statusCode, response);
+        }
+
+        [HttpGet]
+        [Route("institutions/{institutionId}/devices")]
+        public IActionResult GetInstitutionsDevices(string institutionId, [FromQuery] Pagination pageInfo)
+        {
+            DevicesGetResponse response = new DevicesGetResponse();
+            try
+            {
+                response = _institutionRepository.GetInstitutionsDevices(institutionId, pageInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, new ErrorResponse { Error = ex.Message });
+            }
+            return StatusCode(StatusCodes.Status200OK, response);
         }
     }
 }

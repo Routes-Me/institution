@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace InstitutionService.Helper.Models
+﻿namespace InstitutionService.Helper.Models
 {
     public class Dependencies
     {
         public string UserUrl { get; set; }
+        public string InstitutionVehiclesUrl { get; set; }
+        public string VehicleDevicesUrl { get; set; }
     }
 }
