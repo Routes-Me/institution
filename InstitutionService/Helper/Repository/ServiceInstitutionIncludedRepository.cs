@@ -40,8 +40,8 @@ namespace InstitutionService.Helper.Repository
                     });
                 }
             }
-            var institutionsList = lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
-            return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
+            return lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
+            // return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
         }
 
         public dynamic GetServiceIncludedData(List<ServicesInstitutionsModel> objServicesInstitutionsModel)
