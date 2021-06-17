@@ -2,8 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 
 namespace InstitutionService.Helper.Functions
 {
@@ -12,10 +11,11 @@ namespace InstitutionService.Helper.Functions
         public static JArray SerializeJsonForIncludedRepo(List<dynamic> objList)
         {
             var modelsJson = JsonConvert.SerializeObject(objList,
-                                 new JsonSerializerSettings
-                                 {
-                                     NullValueHandling = NullValueHandling.Ignore,
-                                 });
+                                new JsonSerializerSettings
+                                {
+                                    NullValueHandling = NullValueHandling.Ignore,
+                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                });
             return JArray.Parse(modelsJson);
         }
     }
