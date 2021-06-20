@@ -1,15 +1,12 @@
 ﻿using InstitutionService.Helper.Abstraction;
-using InstitutionService.Helper.Functions;
 using InstitutionService.Helper.Models;
 using InstitutionService.Models;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RoutesSecurity;
 using RestSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -47,8 +44,7 @@ namespace InstitutionService.Helper.Repository
                     });
                 }
             }
-            var institutionsList = lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
-            return Common.SerializeJsonForIncludedRepo(institutionsList.Cast<dynamic>().ToList());
+            return lstInstitutions.GroupBy(x => x.InstitutionId).Select(a => a.First()).ToList();
         }
 
         public dynamic GetUsersIncludedData(List<OfficersModel> objOfficersModelList)
@@ -66,8 +62,7 @@ namespace InstitutionService.Helper.Repository
                     lstUsers.AddRange(userData.data);
                 }
             }
-            var usersList = lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
-            return Common.SerializeJsonForIncludedRepo(usersList.Cast<dynamic>().ToList());
+            return lstUsers.GroupBy(x => x.UserId).Select(a => a.First()).ToList();
         }
     }
 }
