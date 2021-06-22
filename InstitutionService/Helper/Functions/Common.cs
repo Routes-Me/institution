@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Serialization;
 
 namespace InstitutionService.Helper.Functions
 {
@@ -15,6 +13,7 @@ namespace InstitutionService.Helper.Functions
                                  new JsonSerializerSettings
                                  {
                                      NullValueHandling = NullValueHandling.Ignore,
+                                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                                  });
             return JArray.Parse(modelsJson);
         }
