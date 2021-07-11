@@ -18,10 +18,10 @@ namespace InstitutionService.Helper.Repository
 {
     public class OfficersIncludedRepository : IOfficersIncludedRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly AppSettings _appSettings;
         private readonly Dependencies _dependencies;
-        public OfficersIncludedRepository(institutionserviceContext context, IOptions<AppSettings> appSettings, IOptions<Dependencies> dependencies)
+        public OfficersIncludedRepository(InstitutionsContext context, IOptions<AppSettings> appSettings, IOptions<Dependencies> dependencies)
         {
             _context = context;
             _appSettings = appSettings.Value;

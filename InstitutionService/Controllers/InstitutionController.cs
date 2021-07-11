@@ -2,6 +2,7 @@
 using InstitutionService.Models;
 using InstitutionService.Models.ResponseModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace InstitutionService.Controllers
 {
@@ -21,20 +22,12 @@ namespace InstitutionService.Controllers
         public IActionResult GeInstitutions(string institutionId, string include, [FromQuery] Pagination pageInfo)
         {
             dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
-            return StatusCode((int)response.statusCode, response);
-        }
-
-        [HttpGet]
-        [Route("v1/institutions/{institutionId?}")]
-        public IActionResult GeInstitutionsV1(string institutionId, string include, [FromQuery] Pagination pageInfo)
-        {
-            dynamic response = _institutionRepository.GetInstitutions(institutionId, include, pageInfo);
-            return StatusCode(response.statusCode, response);
+            return StatusCode(StatusCodes.Status200OK, response);
         }
 
         [HttpPost]
         [Route("institutions")]
-        public IActionResult Post(InstitutionsModel Model)
+        public IActionResult Post(InstitutionDto Model)
         {
             dynamic response = _institutionRepository.InsertInstitutions(Model);
             return StatusCode((int)response.statusCode, response);
@@ -42,7 +35,7 @@ namespace InstitutionService.Controllers
 
         [HttpPut]
         [Route("institutions")]
-        public IActionResult Put(InstitutionsModel Model)
+        public IActionResult Put(InstitutionDto Model)
         {
             dynamic response = _institutionRepository.UpdateInstitution(Model);
             return StatusCode((int)response.statusCode, response);

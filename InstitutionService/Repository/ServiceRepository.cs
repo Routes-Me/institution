@@ -15,10 +15,10 @@ namespace InstitutionService.Repository
 {
     public class ServiceRepository : IServiceRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly AppSettings _appSettings;
 
-        public ServiceRepository(IOptions<AppSettings> appSettings, institutionserviceContext context)
+        public ServiceRepository(IOptions<AppSettings> appSettings, InstitutionsContext context)
         {
             _appSettings = appSettings.Value;
             _context = context;

@@ -13,10 +13,10 @@ namespace InstitutionService.Helper.Repository
 {
     public class ServiceInstitutionIncludedRepository : IServiceInstitutionIncludedRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly AppSettings _appSettings;
 
-        public ServiceInstitutionIncludedRepository(IOptions<AppSettings> appSettings, institutionserviceContext context)
+        public ServiceInstitutionIncludedRepository(IOptions<AppSettings> appSettings, InstitutionsContext context)
         {
             _appSettings = appSettings.Value;
             _context = context;

@@ -48,14 +48,19 @@ namespace InstitutionService.Models
         }
     }
 
+    public class ErrorMessage
+    {
+        public string Error { get; set; }
+    }
+
     #region Institution Response
 
-    public class InstitutionGetResponse : Response
+    public class InstitutionGetResponse
     {
-        public Pagination pagination { get; set; }
-        public List<InstitutionsModel> data { get; set; }
+        public Pagination Pagination { get; set; }
+        public List<InstitutionDto> Data { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public JObject included { get; set; }
+        public JObject Included { get; set; }
     }
     #endregion
 
@@ -92,14 +97,6 @@ namespace InstitutionService.Models
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject included { get; set; }
-    }
-    #endregion
-
-    #region Invitations Response
-    public class InvitationsGetResponse : Response
-    {
-        public Pagination pagination { get; set; }
-        public List<InvitationsGetModel> data { get; set; }
     }
     #endregion
 

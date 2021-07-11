@@ -18,18 +18,18 @@ namespace InstitutionService.Repository
 {
     public class InstitutionRepository : IInstitutionRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly IInstitutionIncludedRepository _institutionIncludedRepository;
         private readonly AppSettings _appSettings;
 
-        public InstitutionRepository(IOptions<AppSettings> appSettings, institutionserviceContext context, IInstitutionIncludedRepository institutionIncludedRepository)
+        public InstitutionRepository(IOptions<AppSettings> appSettings, InstitutionsContext context, IInstitutionIncludedRepository institutionIncludedRepository)
         {
             _appSettings = appSettings.Value;
             _context = context;
             _institutionIncludedRepository = institutionIncludedRepository;
         }
 
-        public dynamic InsertInstitutions(InstitutionsModel Model)
+        public dynamic InsertInstitutions(InstitutionDto Model)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace InstitutionService.Repository
             }
         }
 
-        public dynamic UpdateInstitution(InstitutionsModel Model)
+        public dynamic UpdateInstitution(InstitutionDto Model)
         {
             try
             {
@@ -162,11 +162,11 @@ namespace InstitutionService.Repository
             {
                 int totalCount = 0;
                 InstitutionGetResponse response = new InstitutionGetResponse();
-                List<InstitutionsModel> objInstitutionsModelList = new List<InstitutionsModel>();
+                List<InstitutionDto> objInstitutionsModelList = new List<InstitutionDto>();
                 if (string.IsNullOrEmpty(institutionId))
                 {
                     var modelList = (from institution in _context.Institutions
-                                     select new InstitutionsModel()
+                                     select new InstitutionDto()
                                      {
                                          InstitutionId = Obfuscation.Encode(institution.InstitutionId),
                                          Name = institution.Name,
@@ -178,7 +178,7 @@ namespace InstitutionService.Repository
 
                     foreach (var item in modelList)
                     {
-                        InstitutionsModel model = new InstitutionsModel();
+                        InstitutionDto model = new InstitutionDto();
                         List<string> services = new List<string>();
                         model.InstitutionId = item.InstitutionId;
                         model.Name = item.Name;
@@ -200,7 +200,7 @@ namespace InstitutionService.Repository
                     int institutionIdDecrypted = Obfuscation.Decode(institutionId);
                     var modelList = (from institution in _context.Institutions
                                      where institution.InstitutionId == institutionIdDecrypted
-                                     select new InstitutionsModel()
+                                     select new InstitutionDto()
                                      {
                                          InstitutionId = Obfuscation.Encode(institution.InstitutionId),
                                          Name = institution.Name,
@@ -213,7 +213,7 @@ namespace InstitutionService.Repository
 
                     foreach (var item in modelList)
                     {
-                        InstitutionsModel model = new InstitutionsModel();
+                        InstitutionDto model = new InstitutionDto();
                         List<string> services = new List<string>();
                         model.InstitutionId = item.InstitutionId;
                         model.Name = item.Name;
@@ -257,12 +257,9 @@ namespace InstitutionService.Repository
                 if (((JContainer)includeData).Count == 0)
                     includeData = null;
 
-                response.status = true;
-                response.message = CommonMessage.InstitutionRetrived;
-                response.pagination = page;
-                response.data = objInstitutionsModelList;
-                response.included = includeData;
-                response.statusCode = StatusCodes.Status200OK;
+                response.Pagination = page;
+                response.Data = objInstitutionsModelList;
+                response.Included = includeData;
                 return response;
             }
             catch (Exception ex)

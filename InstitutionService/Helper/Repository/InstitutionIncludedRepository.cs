@@ -15,15 +15,15 @@ namespace InstitutionService.Helper.Repository
 {
     public class InstitutionIncludedRepository : IInstitutionIncludedRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly AppSettings _appSettings;
 
-        public InstitutionIncludedRepository(IOptions<AppSettings> appSettings, institutionserviceContext context)
+        public InstitutionIncludedRepository(IOptions<AppSettings> appSettings, InstitutionsContext context)
         {
             _appSettings = appSettings.Value;
             _context = context;
         }
-        public dynamic GetServiceIncludedData(List<InstitutionsModel> objInstitutionsModelList)
+        public dynamic GetServiceIncludedData(List<InstitutionDto> objInstitutionsModelList)
         {
             List<ServicesModel> lstServices = new List<ServicesModel>();
             foreach (var item in objInstitutionsModelList)

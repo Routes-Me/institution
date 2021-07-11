@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace InstitutionService.Models.DBModels
 {
-    public partial class institutionserviceContext : DbContext
+    public partial class InstitutionsContext : DbContext
     {
-        public institutionserviceContext()
+        public InstitutionsContext()
         {
         }
 
-        public institutionserviceContext(DbContextOptions<institutionserviceContext> options)
+        public InstitutionsContext(DbContextOptions<InstitutionsContext> options)
             : base(options)
         {
         }
