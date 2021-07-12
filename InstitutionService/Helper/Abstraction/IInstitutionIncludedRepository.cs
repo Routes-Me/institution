@@ -5,6 +5,6 @@ namespace InstitutionService.Helper.Abstraction
 {
     public interface IInstitutionIncludedRepository
     {
-        dynamic GetServiceIncludedData(List<InstitutionsModel> objInstitutionsModelList);
+        dynamic GetServiceIncludedData(List<InstitutionDto> objInstitutionsModelList);
     }
 }

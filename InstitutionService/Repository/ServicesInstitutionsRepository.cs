@@ -17,11 +17,11 @@ namespace InstitutionService.Repository
 {
     public class ServicesInstitutionsRepository : IServicesInstitutionsRepository
     {
-        private readonly institutionserviceContext _context;
+        private readonly InstitutionsContext _context;
         private readonly IServiceInstitutionIncludedRepository _serviceInstitutionIncludedRepository;
         private readonly AppSettings _appSettings;
 
-        public ServicesInstitutionsRepository(IOptions<AppSettings> appSettings, institutionserviceContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
+        public ServicesInstitutionsRepository(IOptions<AppSettings> appSettings, InstitutionsContext context, IServiceInstitutionIncludedRepository serviceInstitutionIncludedRepository)
         {
             _appSettings = appSettings.Value;
             _context = context;

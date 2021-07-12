@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace InstitutionService.Models.ResponseModel
 {
-    public class InstitutionsModel
+    public class InstitutionDto
     {
         public string InstitutionId { get; set; }
         public string Name { get; set; }

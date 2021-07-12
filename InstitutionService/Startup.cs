@@ -37,9 +37,10 @@ namespace InstitutionService
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
 
-            services.AddDbContext<Models.DBModels.institutionserviceContext>(options =>
+            services.AddDbContext<Models.DBModels.InstitutionsContext>(options =>
             {
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
             });
@@ -53,6 +54,7 @@ namespace InstitutionService
             services.AddScoped<IOfficersIncludedRepository, OfficersIncludedRepository>();
             services.AddScoped<IInstitutionIncludedRepository, InstitutionIncludedRepository>();
             services.AddScoped<IAuthoritiesRepository, AuthoritiesRepository>();
+            services.AddScoped<IInstitutionsReportRepository, InstitutionsReportRepository>();
 
             var dependenciessSection = Configuration.GetSection("Dependencies");
             services.Configure<Dependencies>(dependenciessSection);
