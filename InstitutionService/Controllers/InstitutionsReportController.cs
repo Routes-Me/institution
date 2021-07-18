@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using InstitutionService.Abstraction;
 using InstitutionService.Models;
 
-namespace InstitutionService.Controllers
+namespace InstitutionService.Internal.Controllers
 {
     [ApiController]
     [ApiVersion( "1.0" )]
@@ -21,18 +21,18 @@ namespace InstitutionService.Controllers
 
         [HttpPost]
         [Route("institutions/reports")]
-        public IActionResult ReportInstitutions(List<string> institutionIds, [FromQuery] List<string> attr)
+        public IActionResult ReportInstitutions(List<int> institutionIds, [FromQuery] List<string> attr)
         {
-            InstitutionGetResponse response = new InstitutionGetResponse();
+            InstitutionsGetReportDto institutionsGetReportDto = new InstitutionsGetReportDto();
             try
             {
-                response.Data = _institutionReportRepository.ReportInstitutions(institutionIds, attr);
+                institutionsGetReportDto.Data = _institutionReportRepository.ReportInstitutions(institutionIds, attr);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, new ErrorMessage { Error = ex.Message });
             }
-            return StatusCode(StatusCodes.Status200OK, response);
+            return StatusCode(StatusCodes.Status200OK, institutionsGetReportDto);
         }
     }
 }

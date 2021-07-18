@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
-using RoutesSecurity;
 using System.Collections.Generic;
 using System.Linq;
 using InstitutionService.Abstraction;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Helper.Models;
-using InstitutionService.Models.ResponseModel;
+using InstitutionService.Internal.Dto;
 using System.Data;
 
-namespace InstitutionService.Repository
+namespace InstitutionService.Internal.Repository
 {
     public class InstitutionsReportRepository : IInstitutionsReportRepository
     {
@@ -21,14 +20,12 @@ namespace InstitutionService.Repository
             _context = context;
         }
 
-        public dynamic ReportInstitutions(List<string> institutionIds, List<string> attributes)
+        public List<InstitutionReportDto> ReportInstitutions(List<int> institutionIds, List<string> attributes)
         {
-            List<int> institutionIdsDecrypted = institutionIds.Select(v => Obfuscation.Decode(v)).ToList();
-
             return _context.Institutions
-                .Where(v => institutionIdsDecrypted.Contains(v.InstitutionId))
-                .Select(v => new InstitutionDto {
-                    InstitutionId = Obfuscation.Encode(v.InstitutionId),
+                .Where(v => institutionIds.Contains(v.InstitutionId))
+                .Select(v => new InstitutionReportDto {
+                    InstitutionId = v.InstitutionId,
                     Name = attributes.Contains(nameof(v.Name)) ? v.Name : null,
                     PhoneNumber = attributes.Contains(nameof(v.PhoneNumber)) ? v.PhoneNumber : null,
                     CountryIso = attributes.Contains(nameof(v.CountryIso)) ? v.CountryIso : null,
