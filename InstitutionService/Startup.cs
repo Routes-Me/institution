@@ -3,6 +3,7 @@ using InstitutionService.Helper.Abstraction;
 using InstitutionService.Helper.Models;
 using InstitutionService.Helper.Repository;
 using InstitutionService.Repository;
+using InstitutionService.Internal.Abstraction;
 using InstitutionService.Internal.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;

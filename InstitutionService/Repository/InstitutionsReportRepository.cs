@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
-using InstitutionService.Abstraction;
+using InstitutionService.Internal.Abstraction;
 using InstitutionService.Models.DBModels;
 using InstitutionService.Helper.Models;
 using InstitutionService.Internal.Dto;

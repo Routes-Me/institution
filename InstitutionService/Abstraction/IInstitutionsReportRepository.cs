@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using InstitutionService.Internal.Dto;
 
-namespace InstitutionService.Abstraction
+namespace InstitutionService.Internal.Abstraction
 {
     public interface IInstitutionsReportRepository
     {

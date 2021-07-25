@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using InstitutionService.Abstraction;
+using InstitutionService.Internal.Abstraction;
 using InstitutionService.Models;
 
 namespace InstitutionService.Internal.Controllers
