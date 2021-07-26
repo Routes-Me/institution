@@ -1,4 +1,5 @@
 ﻿using InstitutionService.Models.ResponseModel;
+using InstitutionService.Internal.Dto;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -62,6 +63,12 @@ namespace InstitutionService.Models
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public JObject Included { get; set; }
     }
+
+    public class InstitutionsGetReportDto
+    {
+        public List<InstitutionReportDto> Data { get; set; }
+    }
+
     #endregion
 
     #region Services Response

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using InstitutionService.Internal.Dto;
 
-namespace InstitutionService.Abstraction
+namespace InstitutionService.Internal.Abstraction
 {
     public interface IInstitutionsReportRepository
     {
-        dynamic ReportInstitutions(List<string> institutionIds, List<string> attributes);
+        List<InstitutionReportDto> ReportInstitutions(List<int> institutionIds, List<string> attributes);
     }
 }
