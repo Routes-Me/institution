@@ -46,9 +46,9 @@ namespace InstitutionService.Repository
                 _context.Institutions.Add(objInstitutions);
                 _context.SaveChanges();
 
-                if (Model.services != null)
+                if (Model.Services != null)
                 {
-                    foreach (var item in Model.services)
+                    foreach (var item in Model.Services)
                     {
                         int serviceIdDecrypted = Obfuscation.Decode(item);
                         var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
@@ -90,7 +90,7 @@ namespace InstitutionService.Repository
                 _context.Institutions.Update(institution);
                 _context.SaveChanges();
 
-                if (Model.services != null)
+                if (Model.Services != null)
                 {
                     var servicesInstitutions = _context.ServicesInstitutions.Where(x => x.InstitutionId == institutionIdDecrypted).ToList();
                     if (servicesInstitutions != null && servicesInstitutions.Count > 0)
@@ -101,7 +101,7 @@ namespace InstitutionService.Repository
                             _context.SaveChanges();
                         }
                     }
-                    foreach (var item in Model.services)
+                    foreach (var item in Model.Services)
                     {
                         int serviceIdDecrypted = Obfuscation.Decode(item);
                         var servicesDetails = _context.Services.Where(x => x.ServiceId == serviceIdDecrypted).FirstOrDefault();
@@ -173,7 +173,7 @@ namespace InstitutionService.Repository
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
                                          CountryIso = institution.CountryIso,
-                                         services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
+                                         Services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
                                      }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
                     foreach (var item in modelList)
@@ -185,10 +185,10 @@ namespace InstitutionService.Repository
                         model.CreatedAt = item.CreatedAt;
                         model.PhoneNumber = item.PhoneNumber;
                         model.CountryIso = item.CountryIso;
-                        foreach (var item1 in item.services)
+                        foreach (var item1 in item.Services)
                         {
                             services.Add(Obfuscation.Encode(Convert.ToInt32(item1)));
-                            model.services = services;
+                            model.Services = services;
                         }
                         objInstitutionsModelList.Add(model);
                     }
@@ -207,7 +207,7 @@ namespace InstitutionService.Repository
                                          CreatedAt = institution.CreatedAt,
                                          PhoneNumber = institution.PhoneNumber,
                                          CountryIso = institution.CountryIso,
-                                         services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
+                                         Services = institution.ServicesInstitutions.Select(x => x.ServiceId.ToString()).ToList()
                                      }).AsEnumerable().OrderBy(a => a.InstitutionId).Skip((pageInfo.offset - 1) * pageInfo.limit).Take(pageInfo.limit).ToList();
 
 
@@ -220,10 +220,10 @@ namespace InstitutionService.Repository
                         model.CreatedAt = item.CreatedAt;
                         model.PhoneNumber = item.PhoneNumber;
                         model.CountryIso = item.CountryIso;
-                        foreach (var item1 in item.services)
+                        foreach (var item1 in item.Services)
                         {
                             services.Add(Obfuscation.Encode(Convert.ToInt32(item1)));
-                            model.services = services;
+                            model.Services = services;
                         }
                         objInstitutionsModelList.Add(model);
                     }
