@@ -10,4 +10,9 @@ namespace InstitutionService.Internal.Dto
         public string PhoneNumber { get; set; }
         public string CountryIso { get; set; }
     }
+
+    public class InstitutionNameResponse
+    {
+        public string Name { get; set; }
+    }
 }

@@ -20,6 +20,11 @@ namespace InstitutionService.Internal.Repository
             _context = context;
         }
 
+        public string GetName(int institutionId)
+        {
+            return _context.Institutions.Where(x => x.InstitutionId == institutionId).FirstOrDefault()?.Name;
+        }
+
         public List<InstitutionReportDto> ReportInstitutions(List<int> institutionIds, List<string> attributes)
         {
             return _context.Institutions

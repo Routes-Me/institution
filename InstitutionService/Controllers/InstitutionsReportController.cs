@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InstitutionService.Internal.Abstraction;
 using InstitutionService.Models;
+using InstitutionService.Internal.Dto;
 
 namespace InstitutionService.Internal.Controllers
 {
@@ -33,6 +34,23 @@ namespace InstitutionService.Internal.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, new ErrorMessage { Error = ex.Message });
             }
             return StatusCode(StatusCodes.Status200OK, institutionsGetReportDto);
+        }
+
+        [HttpGet]
+        [Route("institutions/reports/{institutionId?}")]
+        public IActionResult InstitutionName(int institutionId)
+        {
+            var response = new InstitutionNameResponse();
+            try
+            {
+                response.Name = _institutionReportRepository.GetName(institutionId);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
+            }
+
+            return StatusCode(StatusCodes.Status200OK, response);
         }
     }
 }
